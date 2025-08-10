@@ -190,6 +190,50 @@ export default function TeacherSidebar() {
                 <Link
                   className={
                     "text-xs uppercase py-3 font-bold block " +
+                    (isActive("/admin/test-upload")
+                      ? "text-lightBlue-500 hover:text-lightBlue-600"
+                      : "text-blueGray-700 hover:text-blueGray-500")
+                  }
+                  to="/admin/test-upload"
+                >
+                  <i
+                    className={
+                      "fas fa-upload mr-2 text-sm " +
+                      (isActive("/admin/test-upload")
+                        ? "opacity-75"
+                        : "text-blueGray-300")
+                    }
+                  ></i>{" "}
+                  Test Upload Audio
+                </Link>
+              </li>
+
+              <li className="items-center">
+                <Link
+                  className={
+                    "text-xs uppercase py-3 font-bold block " +
+                    (isActive("/admin/create-listening")
+                      ? "text-lightBlue-500 hover:text-lightBlue-600"
+                      : "text-blueGray-700 hover:text-blueGray-500")
+                  }
+                  to="/admin/create-listening"
+                >
+                  <i
+                    className={
+                      "fas fa-headphones mr-2 text-sm " +
+                      (isActive("/admin/create-listening")
+                        ? "opacity-75"
+                        : "text-blueGray-300")
+                    }
+                  ></i>{" "}
+                  Tạo bài nghe
+                </Link>
+              </li>
+
+              <li className="items-center">
+                <Link
+                  className={
+                    "text-xs uppercase py-3 font-bold block " +
                     (isActive("/admin/lessons")
                       ? "text-lightBlue-500 hover:text-lightBlue-600"
                       : "text-blueGray-700 hover:text-blueGray-500")
@@ -297,16 +341,13 @@ export default function TeacherSidebar() {
 
             <ul className="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
               <li className="items-center">
-                <button
+                <Link
                   className="w-full text-left text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
-                  onClick={() => {
-                    // TODO: Implement create lesson functionality
-                    alert('Tính năng tạo bài học mới sẽ được phát triển');
-                  }}
+                  to="/admin/create-listening"
                 >
                   <i className="fas fa-plus text-blueGray-400 mr-2 text-sm"></i>{" "}
                   Tạo bài học
-                </button>
+                </Link>
               </li>
 
               <li className="items-center">

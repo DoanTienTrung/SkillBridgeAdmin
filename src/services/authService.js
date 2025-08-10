@@ -6,6 +6,27 @@ import { API_ENDPOINTS } from './config';
  */
 class AuthService {
   
+
+
+  // File size limits
+MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+
+// Allowed formats
+ALLOWED_EXTENSIONS = ['mp3', 'wav', 'm4a', 'aac', 'ogg'];
+
+// Allowed MIME types
+ALLOWED_MIME_TYPES = [
+    'audio/mpeg', 'audio/mp3', 'audio/wav', 
+    'audio/wave', 'audio/x-wav', 'audio/mp4', 
+    'audio/aac', 'audio/ogg'
+];
+
+ERROR_MESSAGES = {
+    FILE_TOO_LARGE: 'File quá lớn. Kích thước tối đa là 50MB',
+    INVALID_FORMAT: 'Format không hỗ trợ. Chỉ chấp nhận MP3, WAV, M4A, AAC, OGG',
+    UPLOAD_FAILED: 'Upload thất bại. Vui lòng thử lại',
+    DELETE_FAILED: 'Xóa file thất bại'
+};
   /**
    * Login user với API thật
    */

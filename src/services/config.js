@@ -24,6 +24,10 @@ export const API_ENDPOINTS = {
   LISTENING_LESSONS: '/listening-lessons',
   LISTENING_LESSON_BY_ID: (id) => `/listening-lessons/${id}`,
   PUBLISH_LESSON: (id) => `/listening-lessons/${id}/publish`,
+
+  // Audio Upload
+  AUDIO_UPLOAD: '/audio/upload',
+  AUDIO_DELETE: (fileName) => `/audio/${fileName}`,
   
   // Categories
   CATEGORIES: '/categories'
@@ -49,4 +53,8 @@ export const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500
 };
 
+
+
 export default API_BASE_URL;
+
+

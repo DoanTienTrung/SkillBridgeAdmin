@@ -128,12 +128,104 @@ class HttpClient {
   }
 
   /**
+   * Upload file với progress tracking
+   * Sử dụng XMLHttpRequest thay vì fetch để có progress events
+   * @param {string} endpoint - API endpoint
+   * @param {FormData} formData - FormData object chứa file
+   * @param {Function} onProgress - Callback cho progress (0-100)
+   * @param {Object} customHeaders - Custom headers
+   * @returns {Promise} Upload result
+   */
+  async uploadFile(endpoint, formData, onProgress = null, customHeaders = {}) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      const url = `${this.baseURL}${endpoint}`;
+
+      // Setup progress tracking
+      if (onProgress && typeof onProgress === 'function') {
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            const progress = Math.round((event.loaded / event.total) * 100);
+            onProgress(progress);
+          }
+        });
+      }
+
+      // Handle response
+      xhr.addEventListener('load', async () => {
+        try {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            const response = JSON.parse(xhr.responseText);
+            resolve(response);
+          } else {
+            const errorResponse = JSON.parse(xhr.responseText);
+            reject(new Error(errorResponse.message || `HTTP ${xhr.status}`));
+          }
+        } catch (error) {
+          reject(new Error('Invalid response format'));
+        }
+      });
+
+      // Handle errors
+      xhr.addEventListener('error', () => {
+        reject(new Error('Network error'));
+      });
+
+      xhr.addEventListener('timeout', () => {
+        reject(new Error('Upload timeout'));
+      });
+
+      // Setup request
+      xhr.open('POST', url);
+      
+      // Set headers (don't set Content-Type for FormData)
+      const token = this.getAuthToken();
+      if (token) {
+        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      }
+      
+      // Apply custom headers
+      Object.keys(customHeaders).forEach(key => {
+        if (key !== 'Content-Type') { // Let browser set Content-Type for FormData
+          xhr.setRequestHeader(key, customHeaders[key]);
+        }
+      });
+
+      // Set timeout (30 seconds)
+      xhr.timeout = 30000;
+
+      // Send request
+      console.log(`[HTTP Upload] POST ${url}`);
+      xhr.send(formData);
+    });
+  }
+
+  /**
    * PATCH request
    */
   async patch(endpoint, data = null) {
     return this.request(endpoint, {
       method: 'PATCH',
       body: data ? JSON.stringify(data) : null
+    });
+  }
+
+  /**
+   * POST request với multipart/form-data (cho file uploads)
+   * @param {string} endpoint - API endpoint
+   * @param {FormData} formData - FormData object
+   * @param {Object} options - Additional options
+   * @returns {Promise} Response data
+   */
+  async postMultipart(endpoint, formData, options = {}) {
+    const customHeaders = { ...options.headers };
+    // Don't set Content-Type, let browser handle it for FormData
+    delete customHeaders['Content-Type'];
+    
+    return this.request(endpoint, {
+      method: 'POST',
+      headers: customHeaders,
+      body: formData
     });
   }
 
