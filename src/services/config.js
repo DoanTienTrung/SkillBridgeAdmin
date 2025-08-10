@@ -1,5 +1,9 @@
 // API Configuration
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+
+// Environment check
+export const IS_DEVELOPMENT = process.env.NODE_ENV === 'development';
+export const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 // API Endpoints
 export const API_ENDPOINTS = {
