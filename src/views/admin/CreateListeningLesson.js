@@ -1,17 +1,22 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import audioService, { AudioUploadError } from '../../services/audioService';
+import lessonService from '../../services/lessonService';
 
 export default function CreateListeningLesson() {
   // Lesson Information State
   const [lessonData, setLessonData] = useState({
-    title: '',
-    description: '',
-    difficulty: 'beginner',
-    category: 'conversation',
-    tags: '',
-    transcript: '',
-    instructions: 'Listen to the audio and answer the questions below.'
-  });
+  title: '',
+  description: '',
+  level: 'A2',
+  categoryId: null,
+  audioUrl: '',
+  transcript: '',
+  durationSeconds: 0,
+  tags: '',  // ✅ THÊM tags field
+  instructions: 'Listen to the audio and answer the questions below.'  // ✅ THÊM instructions
+});
+
+
 
   // Audio Upload State
   const [selectedFile, setSelectedFile] = useState(null);
@@ -42,6 +47,40 @@ export default function CreateListeningLesson() {
   const fileInputRef = useRef(null);
   const audioPlayerRef = useRef(null);
 
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+
+ useEffect(() => {
+  const loadCategories = async () => {
+    try {
+      setLoadingCategories(true);
+      console.log('🔄 Loading categories...');
+      
+      const response = await lessonService.getCategories();
+      
+      console.log('📡 API Response:', response);
+      console.log('📂 Categories data:', response.data);
+      
+      setCategories(response || []);
+      
+      if (response.data && response.data.length > 0) {
+        console.log('✅ Successfully loaded', response.data.length, 'categories');
+      } else {
+        console.warn('⚠️ No categories returned from API');
+      }
+      
+    } catch (error) {
+      console.error('❌ Failed to load categories:', error);
+      setError('Không thể tải danh sách thể loại. Vui lòng reload trang.');
+    } finally {
+      setLoadingCategories(false);
+      console.log('🏁 Finished loading categories');
+    }
+  };
+
+  loadCategories();
+}, []);
+
   // Handle lesson data change
   const handleLessonDataChange = (field, value) => {
     setLessonData(prev => ({
@@ -55,7 +94,7 @@ export default function CreateListeningLesson() {
     if (!file) return;
 
     console.log('🎵 Selected audio file:', file.name);
-    
+
     setError('');
     setUploadResult(null);
     setUploadProgress(0);
@@ -66,7 +105,7 @@ export default function CreateListeningLesson() {
 
     if (validationResult.isValid) {
       setSelectedFile(file);
-      
+
       audioService.getAudioDuration(file)
         .then(duration => {
           setAudioDuration(duration);
@@ -102,7 +141,7 @@ export default function CreateListeningLesson() {
   const handleDrop = (event) => {
     event.preventDefault();
     setDragOver(false);
-    
+
     const files = event.dataTransfer.files;
     if (files.length > 0) {
       handleFileSelect(files[0]);
@@ -111,53 +150,80 @@ export default function CreateListeningLesson() {
 
   // Handle audio upload
   const handleUploadAudio = async () => {
-    if (!selectedFile) return;
+  if (!selectedFile) return;
 
-    setUploading(true);
-    setUploadProgress(0);
-    setError('');
+  setUploading(true);
+  setUploadProgress(0);
+  setError('');
 
-    try {
-      console.log('🚀 Starting audio upload:', selectedFile.name);
-      
-      const result = await audioService.uploadAudio(selectedFile, (progress) => {
-        setUploadProgress(progress);
-      });
+  try {
+    console.log('🚀 Starting audio upload:', selectedFile.name);
+    
+    const result = await audioService.uploadAudio(selectedFile, (progress) => {
+      setUploadProgress(progress);
+    });
 
-      setUploadResult(result);
-      console.log('✅ Audio uploaded successfully:', result);
+    setUploadResult(result);
+    
+    // ✅ THÊM: Sync audioUrl vào lessonData
+    setLessonData(prev => ({
+      ...prev,
+      audioUrl: result.audioUrl
+    }));
 
-    } catch (error) {
-      console.error('❌ Audio upload failed:', error);
-      
-      if (error instanceof AudioUploadError) {
-        setError(`${error.message} (Code: ${error.code})`);
-      } else {
-        setError(error.message || 'Upload failed');
-      }
-    } finally {
-      setUploading(false);
+    // ✅ THÊM: Sync duration nếu có
+    if (audioDuration && audioDuration !== 'Unknown') {
+      const durationInSeconds = parseDuration(audioDuration);
+      setLessonData(prev => ({
+        ...prev,
+        durationSeconds: durationInSeconds
+      }));
     }
-  };
+
+    console.log('✅ Audio uploaded successfully:', result);
+
+  } catch (error) {
+    console.error('❌ Audio upload failed:', error);
+    
+    if (error instanceof AudioUploadError) {
+      setError(`${error.message} (Code: ${error.code})`);
+    } else {
+      setError(error.message || 'Upload failed');
+    }
+  } finally {
+    setUploading(false);
+  }
+};
+
+// ✅ THÊM: Helper function để parse duration
+const parseDuration = (durationString) => {
+  const parts = durationString.split(':');
+  if (parts.length === 2) {
+    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+  } else if (parts.length === 3) {
+    return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(parts[2]);
+  }
+  return 0;
+};
 
   // Handle question changes
   const handleQuestionChange = (questionId, field, value) => {
-    setQuestions(prev => prev.map(q => 
-      q.id === questionId 
+    setQuestions(prev => prev.map(q =>
+      q.id === questionId
         ? { ...q, [field]: value }
         : q
     ));
   };
 
   const handleOptionChange = (questionId, optionIndex, value) => {
-    setQuestions(prev => prev.map(q => 
-      q.id === questionId 
-        ? { 
-            ...q, 
-            options: q.options.map((opt, idx) => 
-              idx === optionIndex ? value : opt
-            )
-          }
+    setQuestions(prev => prev.map(q =>
+      q.id === questionId
+        ? {
+          ...q,
+          options: q.options.map((opt, idx) =>
+            idx === optionIndex ? value : opt
+          )
+        }
         : q
     ));
   };
@@ -182,91 +248,117 @@ export default function CreateListeningLesson() {
 
   // Handle save lesson
   const handleSaveLesson = async () => {
-    // Validation
-    if (!lessonData.title.trim()) {
-      setError('Vui lòng nhập tiêu đề bài học');
-      return;
+  // ✅ Enhanced validation
+  if (!lessonData.title.trim()) {
+    setError('Vui lòng nhập tiêu đề bài học');
+    return;
+  }
+
+  if (!lessonData.audioUrl) {
+    setError('Vui lòng upload file audio trước khi lưu');
+    return;
+  }
+
+  if (!lessonData.categoryId) {
+    setError('Vui lòng chọn thể loại bài học');
+    return;
+  }
+
+  // Check questions validation
+  const invalidQuestions = questions.filter(q => 
+    !q.question.trim() || 
+    q.options.some(opt => !opt.trim())
+  );
+
+  if (invalidQuestions.length > 0) {
+    setError('Vui lòng điền đầy đủ câu hỏi và các lựa chọn');
+    return;
+  }
+
+  setSaving(true);
+  setError('');
+
+  try {
+    // ✅ Prepare data theo backend DTO format
+    const lessonCreateDto = {
+      title: lessonData.title.trim(),
+      description: lessonData.description.trim(),
+      level: lessonData.level,
+      categoryId: lessonData.categoryId,
+      audioUrl: lessonData.audioUrl,
+      transcript: lessonData.transcript.trim(),
+      durationSeconds: lessonData.durationSeconds || 0
+    };
+
+    console.log('💾 Creating lesson with data:', lessonCreateDto);
+
+    // ✅ Call real API
+    const response = await lessonService.createListeningLesson(lessonCreateDto);
+    
+    console.log('✅ Lesson created successfully:', response);
+
+    // ✅ Success feedback
+    alert(`✅ Bài học "${lessonData.title}" đã được tạo thành công!\n\nID: ${response.data?.id}\nStatus: ${response.data?.status}`);
+    
+    // ✅ Reset form
+    resetForm();
+
+  } catch (error) {
+    console.error('❌ Save lesson failed:', error);
+    
+    // Enhanced error message
+    let errorMessage = 'Lưu bài học thất bại';
+    if (error.message.includes('401')) {
+      errorMessage = 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.';
+    } else if (error.message.includes('403')) {
+      errorMessage = 'Bạn không có quyền tạo bài học. Cần role TEACHER hoặc ADMIN.';
+    } else if (error.message.includes('400')) {
+      errorMessage = 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại thông tin.';
+    } else {
+      errorMessage = `Lưu bài học thất bại: ${error.message}`;
     }
+    
+    setError(errorMessage);
+  } finally {
+    setSaving(false);
+  }
+};
 
-    if (!uploadResult) {
-      setError('Vui lòng upload file audio trước khi lưu');
-      return;
-    }
-
-    // Check if questions are valid
-    const invalidQuestions = questions.filter(q => 
-      !q.question.trim() || 
-      q.options.some(opt => !opt.trim())
-    );
-
-    if (invalidQuestions.length > 0) {
-      setError('Vui lòng điền đầy đủ câu hỏi và các lựa chọn');
-      return;
-    }
-
-    setSaving(true);
-    setError('');
-
-    try {
-      // Prepare lesson data
-      const completeLessonData = {
-        ...lessonData,
-        audioFile: uploadResult,
-        questions: questions,
-        audioDuration: audioDuration,
-        createdAt: new Date().toISOString(),
-        status: 'draft'
-      };
-
-      console.log('💾 Saving lesson:', completeLessonData);
-
-      // TODO: Call API to save lesson
-      // const response = await lessonService.createListeningLesson(completeLessonData);
-
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      alert('✅ Bài học đã được lưu thành công!');
-      
-      // Reset form
-      setLessonData({
-        title: '',
-        description: '',
-        difficulty: 'beginner',
-        category: 'conversation',
-        tags: '',
-        transcript: '',
-        instructions: 'Listen to the audio and answer the questions below.'
-      });
-      setSelectedFile(null);
-      setUploadResult(null);
-      setValidation(null);
-      setQuestions([{
-        id: 1,
-        question: '',
-        type: 'multiple-choice',
-        options: ['', '', '', ''],
-        correctAnswer: 0,
-        explanation: ''
-      }]);
-      setActiveTab('basic');
-
-    } catch (error) {
-      console.error('❌ Save lesson failed:', error);
-      setError('Lưu bài học thất bại. Vui lòng thử lại.');
-    } finally {
-      setSaving(false);
-    }
-  };
+// ✅ THÊM: Helper function để reset form
+const resetForm = () => {
+  setLessonData({
+    title: '',
+    description: '',
+    level: 'A2',
+    categoryId: null,
+    audioUrl: '',
+    transcript: '',
+    durationSeconds: 0
+  });
+  setSelectedFile(null);
+  setUploadResult(null);
+  setValidation(null);
+  setQuestions([{
+    id: 1,
+    question: '',
+    type: 'multiple-choice',
+    options: ['', '', '', ''],
+    correctAnswer: 0,
+    explanation: ''
+  }]);
+  setActiveTab('basic');
+  setError('');
+  setAudioDuration('');
+  if (fileInputRef.current) fileInputRef.current.value = '';
+};
 
   // Render validation status
   const renderValidationStatus = () => {
     if (!validation) return null;
 
     return (
-      <div className={`p-4 rounded-lg mb-4 ${
-        validation.isValid ? 'bg-emerald-100 border border-emerald-400 text-emerald-700' : 'bg-red-100 border border-red-400 text-red-700'
-      }`}>
+      <div className={`p-4 rounded-lg mb-4 ${validation.isValid ? 'bg-emerald-100 border border-emerald-400 text-emerald-700' : 'bg-red-100 border border-red-400 text-red-700'
+        }`}>
         <div className="flex items-center">
           <i className={`fas ${validation.isValid ? 'fa-check-circle' : 'fa-exclamation-triangle'} mr-2`}></i>
           <span className="font-medium">
@@ -317,11 +409,10 @@ export default function CreateListeningLesson() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
-                      activeTab === tab.id
-                        ? 'bg-lightBlue-500 text-white'
-                        : 'bg-blueGray-100 text-blueGray-600 hover:bg-blueGray-200'
-                    }`}
+                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${activeTab === tab.id
+                      ? 'bg-lightBlue-500 text-white'
+                      : 'bg-blueGray-100 text-blueGray-600 hover:bg-blueGray-200'
+                      }`}
                   >
                     <i className={`fas ${tab.icon} mr-2`}></i>
                     {tab.name}
@@ -353,13 +444,14 @@ export default function CreateListeningLesson() {
                         Mức độ khó
                       </label>
                       <select
-                        value={lessonData.difficulty}
-                        onChange={(e) => handleLessonDataChange('difficulty', e.target.value)}
+                        value={lessonData.level}
+                        onChange={(e) => handleLessonDataChange('level', e.target.value)}
                         className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                       >
-                        <option value="beginner">Beginner (Cơ bản)</option>
-                        <option value="intermediate">Intermediate (Trung cấp)</option>
-                        <option value="advanced">Advanced (Nâng cao)</option>
+                        <option value="A2">A2 (Cơ bản)</option>
+                        <option value="B1">B1 (Trung cấp thấp)</option>
+                        <option value="B2">B2 (Trung cấp cao)</option>
+                        <option value="C1">C1 (Nâng cao)</option>
                       </select>
                     </div>
 
@@ -368,16 +460,19 @@ export default function CreateListeningLesson() {
                         Thể loại
                       </label>
                       <select
-                        value={lessonData.category}
-                        onChange={(e) => handleLessonDataChange('category', e.target.value)}
+                        value={lessonData.categoryId || ''}
+                        onChange={(e) => handleLessonDataChange('categoryId', parseInt(e.target.value))}
                         className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                        disabled={loadingCategories}
                       >
-                        <option value="conversation">Conversation (Hội thoại)</option>
-                        <option value="news">News (Tin tức)</option>
-                        <option value="story">Story (Câu chuyện)</option>
-                        <option value="interview">Interview (Phỏng vấn)</option>
-                        <option value="lecture">Lecture (Bài giảng)</option>
-                        <option value="podcast">Podcast</option>
+                        <option value="">
+                          {loadingCategories ? 'Đang tải...' : 'Chọn thể loại...'}
+                        </option>
+                        {categories.map(category => (
+                          <option key={category.id} value={category.id}>
+                            {category.name} - {category.description}
+                          </option>
+                        ))}
                       </select>
                     </div>
 
@@ -427,12 +522,11 @@ export default function CreateListeningLesson() {
               {activeTab === 'audio' && (
                 <div className="space-y-6">
                   {/* Drag and Drop Area */}
-                  <div 
-                    className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                      dragOver 
-                        ? 'border-lightBlue-500 bg-lightBlue-50' 
-                        : 'border-blueGray-300 bg-blueGray-50'
-                    }`}
+                  <div
+                    className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragOver
+                      ? 'border-lightBlue-500 bg-lightBlue-50'
+                      : 'border-blueGray-300 bg-blueGray-50'
+                      }`}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
@@ -446,7 +540,7 @@ export default function CreateListeningLesson() {
                     <p className="text-blueGray-500 mb-4">
                       hoặc click để chọn file
                     </p>
-                    
+
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -455,7 +549,7 @@ export default function CreateListeningLesson() {
                       className="hidden"
                       disabled={uploading}
                     />
-                    
+
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       disabled={uploading}
@@ -464,7 +558,7 @@ export default function CreateListeningLesson() {
                       <i className="fas fa-folder-open mr-2"></i>
                       Chọn file audio
                     </button>
-                    
+
                     <p className="text-xs text-blueGray-400 mt-4">
                       Hỗ trợ: MP3, WAV, M4A, AAC, OGG • Tối đa 50MB
                     </p>
@@ -479,7 +573,7 @@ export default function CreateListeningLesson() {
                       <h4 className="text-lg font-semibold text-blueGray-700 mb-4">
                         File đã chọn: {selectedFile.name}
                       </h4>
-                      
+
                       <div className="flex flex-wrap gap-3 mb-4">
                         <button
                           onClick={handleUploadAudio}
@@ -489,7 +583,7 @@ export default function CreateListeningLesson() {
                           <i className="fas fa-upload mr-2"></i>
                           {uploading ? 'Đang upload...' : uploadResult ? 'Đã upload' : 'Upload Audio'}
                         </button>
-                        
+
                         <button
                           onClick={() => {
                             setSelectedFile(null);
@@ -513,7 +607,7 @@ export default function CreateListeningLesson() {
                             <span className="text-sm text-blueGray-600">{uploadProgress}%</span>
                           </div>
                           <div className="w-full bg-blueGray-200 rounded-full h-3">
-                            <div 
+                            <div
                               className="bg-lightBlue-500 h-3 rounded-full transition-all duration-300"
                               style={{ width: `${uploadProgress}%` }}
                             ></div>
@@ -528,7 +622,7 @@ export default function CreateListeningLesson() {
                             <i className="fas fa-check-circle mr-2"></i>
                             <span className="font-medium">Upload thành công!</span>
                           </div>
-                          
+
                           <div className="text-sm space-y-1">
                             <p><strong>File gốc:</strong> {uploadResult.originalFileName}</p>
                             <p><strong>Kích thước:</strong> {uploadResult.formattedFileSize}</p>
@@ -539,9 +633,9 @@ export default function CreateListeningLesson() {
 
                           {/* Audio Player */}
                           <div className="mt-4">
-                            <audio 
+                            <audio
                               ref={audioPlayerRef}
-                              controls 
+                              controls
                               className="w-full"
                               src={`http://localhost:8080${uploadResult.audioUrl}`}
                             >
@@ -622,11 +716,10 @@ export default function CreateListeningLesson() {
                                 />
                                 <button
                                   onClick={() => handleQuestionChange(question.id, 'correctAnswer', optionIndex)}
-                                  className={`px-3 py-3 rounded-r text-sm font-medium transition-colors ${
-                                    question.correctAnswer === optionIndex
-                                      ? 'bg-emerald-500 text-white'
-                                      : 'bg-blueGray-200 text-blueGray-600 hover:bg-emerald-200'
-                                  }`}
+                                  className={`px-3 py-3 rounded-r text-sm font-medium transition-colors ${question.correctAnswer === optionIndex
+                                    ? 'bg-emerald-500 text-white'
+                                    : 'bg-blueGray-200 text-blueGray-600 hover:bg-emerald-200'
+                                    }`}
                                 >
                                   <i className="fas fa-check"></i>
                                 </button>
@@ -663,7 +756,7 @@ export default function CreateListeningLesson() {
                     <p className="text-sm text-blueGray-500 mb-4">
                       Nhập nội dung chi tiết của file audio để học viên có thể tham khảo sau khi hoàn thành bài nghe.
                     </p>
-                    
+
                     <textarea
                       value={lessonData.transcript}
                       onChange={(e) => handleLessonDataChange('transcript', e.target.value)}
@@ -671,7 +764,7 @@ export default function CreateListeningLesson() {
                       className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                       placeholder="Nhập nội dung transcript ở đây..."
                     />
-                    
+
                     <div className="flex justify-between items-center mt-2 text-xs text-blueGray-400">
                       <span>Ký tự: {lessonData.transcript.length}</span>
                       <span>Từ: {lessonData.transcript.split(/\s+/).filter(word => word.length > 0).length}</span>

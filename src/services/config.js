@@ -28,6 +28,10 @@ export const API_ENDPOINTS = {
   // Audio Upload
   AUDIO_UPLOAD: '/audio/upload',
   AUDIO_DELETE: (fileName) => `/audio/${fileName}`,
+
+
+  
+  QUESTIONS: '/questions',
   
   // Categories
   CATEGORIES: '/categories'
