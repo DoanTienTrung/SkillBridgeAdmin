@@ -32,6 +32,12 @@ export const API_ENDPOINTS = {
 
   
   QUESTIONS: '/questions',
+
+  READING_LESSONS: '/reading-lessons',
+  READING_LESSONS_ADMIN: '/reading-lessons/admin',
+  READING_LESSON_BY_ID: (id) => `/reading-lessons/${id}`,
+  READING_LESSON_STATUS: (id) => `/reading-lessons/${id}/status`,
+  UPLOAD_TEXT_FILE: '/reading-lessons/upload-text',
   
   // Categories
   CATEGORIES: '/categories'

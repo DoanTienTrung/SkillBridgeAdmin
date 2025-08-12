@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import React, { useState, useEffect } from "react";
 import authService from "../../services/authService";
 
@@ -7,6 +8,30 @@ import CardLineChart from "components/Cards/CardLineChart.js";
 import CardBarChart from "components/Cards/CardBarChart.js";
 import CardPageVisits from "components/Cards/CardPageVisits.js";
 import CardSocialTraffic from "components/Cards/CardSocialTraffic.js";
+
+const quickActions = [
+  {
+    title: 'Tạo bài học mới',
+    description: 'Tạo bài nghe hoặc bài đọc',
+    icon: 'fas fa-plus-circle',
+    color: 'bg-lightBlue-500',
+    route: '/admin/create-lesson'
+  },
+  {
+    title: 'Quản lý bài học',
+    description: 'Xem và chỉnh sửa bài học',
+    icon: 'fas fa-book-open',
+    color: 'bg-green-500',
+    route: '/admin/lessons'
+  },
+  {
+    title: 'Xem báo cáo',
+    description: 'Thống kê và phân tích',
+    icon: 'fas fa-chart-line',
+    color: 'bg-orange-500',
+    route: '/admin/reports'
+  }
+];
 
 export default function TeacherDashboard() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -75,11 +100,11 @@ export default function TeacherDashboard() {
                     Chào mừng bạn đến với bảng điều khiển {getRoleDisplayName(currentUser?.role)}
                   </p>
                   <p className="text-sm text-blueGray-400 mt-1">
-                    Hôm nay là {new Date().toLocaleDateString('vi-VN', { 
-                      weekday: 'long', 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
+                    Hôm nay là {new Date().toLocaleDateString('vi-VN', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
                     })}
                   </p>
                 </div>
@@ -206,6 +231,26 @@ export default function TeacherDashboard() {
                         Tạo bài học mới
                       </button>
                     </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      {quickActions.map((action, index) => (
+                        <Link
+                          key={index}
+                          to={action.route}
+                          className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-300"
+                        >
+                          <div className="flex items-center">
+                            <div className={`w-12 h-12 ${action.color} rounded-lg flex items-center justify-center mr-4`}>
+                              <i className={`${action.icon} text-white text-xl`}></i>
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-blueGray-700">{action.title}</h4>
+                              <p className="text-sm text-blueGray-600">{action.description}</p>
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+
                     <div className="w-full sm:w-6/12 lg:w-3/12 px-2 mb-4">
                       <button className="w-full bg-emerald-500 text-white px-4 py-3 rounded-lg hover:bg-emerald-600 transition-colors flex items-center justify-center">
                         <i className="fas fa-users mr-2"></i>

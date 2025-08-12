@@ -9,7 +9,7 @@ import UserDropdown from "components/Dropdowns/UserDropdown.js";
 export default function TeacherSidebar() {
   const [collapseShow, setCollapseShow] = React.useState("hidden");
   const currentUser = authService.getCurrentUserFromToken();
-  
+
   const getRoleDisplayName = (role) => {
     const roleMap = {
       'ADMIN': 'Quản trị viên',
@@ -43,7 +43,7 @@ export default function TeacherSidebar() {
           >
             <i className="fas fa-bars"></i>
           </button>
-          
+
           {/* Brand */}
           <Link
             className="md:block text-left md:pb-2 text-blueGray-600 mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0"
@@ -52,7 +52,7 @@ export default function TeacherSidebar() {
             <i className="fas fa-graduation-cap mr-2 text-lightBlue-500"></i>
             SkillBridge
           </Link>
-          
+
           {/* User */}
           <ul className="md:hidden items-center flex flex-wrap list-none">
             <li className="inline-block relative">
@@ -62,7 +62,7 @@ export default function TeacherSidebar() {
               <UserDropdown />
             </li>
           </ul>
-          
+
           {/* Collapse */}
           <div
             className={
@@ -98,9 +98,9 @@ export default function TeacherSidebar() {
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-blueGray-200 rounded-full flex items-center justify-center mr-3">
                   {currentUser?.avatarUrl ? (
-                    <img 
-                      src={currentUser.avatarUrl} 
-                      alt="Avatar" 
+                    <img
+                      src={currentUser.avatarUrl}
+                      alt="Avatar"
                       className="w-10 h-10 rounded-full object-cover"
                       onError={(e) => {
                         e.target.style.display = 'none';
@@ -125,7 +125,7 @@ export default function TeacherSidebar() {
 
             {/* Divider */}
             <hr className="my-4 md:min-w-full" />
-            
+
             {/* Main Navigation */}
             <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
               Bảng điều khiển
@@ -179,11 +179,29 @@ export default function TeacherSidebar() {
 
             {/* Divider */}
             <hr className="my-4 md:min-w-full" />
-            
+
             {/* Content Management */}
-            <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
-              Quản lý nội dung
-            </h6>
+            <li className="items-center">
+              <Link
+                className={
+                  "text-xs uppercase py-3 font-bold block " +
+                  (isActive("/admin/create-lesson")
+                    ? "text-lightBlue-500 hover:text-lightBlue-600"
+                    : "text-blueGray-700 hover:text-blueGray-500")
+                }
+                to="/admin/create-lesson"
+              >
+                <i
+                  className={
+                    "fas fa-plus-circle mr-2 text-sm " +
+                    (isActive("/admin/create-lesson")
+                      ? "opacity-75"
+                      : "text-blueGray-300")
+                  }
+                ></i>{" "}
+                Tạo bài học
+              </Link>
+            </li>
 
             <ul className="md:flex-col md:min-w-full flex flex-col list-none">
               <li className="items-center">
@@ -208,27 +226,7 @@ export default function TeacherSidebar() {
                 </Link>
               </li>
 
-              <li className="items-center">
-                <Link
-                  className={
-                    "text-xs uppercase py-3 font-bold block " +
-                    (isActive("/admin/create-listening")
-                      ? "text-lightBlue-500 hover:text-lightBlue-600"
-                      : "text-blueGray-700 hover:text-blueGray-500")
-                  }
-                  to="/admin/create-listening"
-                >
-                  <i
-                    className={
-                      "fas fa-headphones mr-2 text-sm " +
-                      (isActive("/admin/create-listening")
-                        ? "opacity-75"
-                        : "text-blueGray-300")
-                    }
-                  ></i>{" "}
-                  Tạo bài nghe
-                </Link>
-              </li>
+
 
               <li className="items-center">
                 <Link
@@ -333,22 +331,17 @@ export default function TeacherSidebar() {
 
             {/* Divider */}
             <hr className="my-4 md:min-w-full" />
-            
+
             {/* Quick Actions */}
             <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
               Thao tác nhanh
             </h6>
 
             <ul className="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
-              <li className="items-center">
-                <Link
-                  className="w-full text-left text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
-                  to="/admin/create-listening"
-                >
-                  <i className="fas fa-plus text-blueGray-400 mr-2 text-sm"></i>{" "}
-                  Tạo bài học
-                </Link>
-              </li>
+              <Link to="/admin/create-lesson">
+                <i className="fas fa-plus text-blueGray-400 mr-2 text-sm"></i>
+                Tạo bài học
+              </Link>
 
               <li className="items-center">
                 <button
