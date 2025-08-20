@@ -22,6 +22,7 @@ export const API_ENDPOINTS = {
   
   // Listening Lessons
   LISTENING_LESSONS: '/listening-lessons',
+  LISTENING_LESSONS_ADMIN: '/listening-lessons/admin',
   LISTENING_LESSON_BY_ID: (id) => `/listening-lessons/${id}`,
   PUBLISH_LESSON: (id) => `/listening-lessons/${id}/publish`,
 
@@ -40,7 +41,15 @@ export const API_ENDPOINTS = {
   UPLOAD_TEXT_FILE: '/reading-lessons/upload-text',
   
   // Categories
-  CATEGORIES: '/categories'
+  CATEGORIES: '/categories',
+  
+  // Student APIs (through UserController)
+  STUDENT_STATS: '/users/student/stats',
+  STUDENT_RECENT_LESSONS: '/users/student/recent-lessons',
+  STUDENT_LESSONS: '/users/student/lessons',
+  STUDENT_LESSON_BY_TYPE_ID: (type, id) => `/users/student/lessons/${type}/${id}`,
+  STUDENT_SUBMIT_ANSWERS: '/users/student/submit-answers',
+  STUDENT_PROGRESS: '/users/student/progress'
 };
 
 // HTTP Methods

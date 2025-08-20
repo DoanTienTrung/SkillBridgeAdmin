@@ -42,8 +42,10 @@ export default function Login() {
     if (user) {
       if (user.role === 'ADMIN' || user.role === 'TEACHER') {
         history.push('/admin/dashboard');
+      } else if (user.role === 'STUDENT') {
+        history.push('/student/dashboard'); // Redirect students to student dashboard
       } else {
-        history.push('/'); // Redirect students to main app
+        history.push('/'); // Default fallback
       }
     }
   };

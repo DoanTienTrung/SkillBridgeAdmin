@@ -21,7 +21,7 @@ const quickActions = [
     title: 'Quản lý bài học',
     description: 'Xem và chỉnh sửa bài học',
     icon: 'fas fa-book-open',
-    color: 'bg-green-500',
+    color: 'bg-purple-500',
     route: '/admin/lessons'
   },
   {
@@ -30,6 +30,13 @@ const quickActions = [
     icon: 'fas fa-chart-line',
     color: 'bg-orange-500',
     route: '/admin/reports'
+  },
+  {
+    title: 'Cài đặt hệ thống',
+    description: 'Cài đặt hệ thống',
+    icon: 'fas fa-cog',
+    color: 'bg-orange-500',
+    route: '/admin/system'
   }
 ];
 
@@ -225,18 +232,18 @@ export default function TeacherDashboard() {
               <div className="block w-full overflow-x-auto">
                 <div className="px-4 py-3">
                   <div className="flex flex-wrap">
-                    <div className="w-full sm:w-6/12 lg:w-3/12 px-2 mb-4">
+                    {/* <div className="w-full sm:w-6/12 lg:w-3/12 px-2 mb-4">
                       <button className="w-full bg-lightBlue-500 text-white px-4 py-3 rounded-lg hover:bg-lightBlue-600 transition-colors flex items-center justify-center">
                         <i className="fas fa-plus mr-2"></i>
                         Tạo bài học mới
                       </button>
-                    </div>
+                    </div> */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                       {quickActions.map((action, index) => (
                         <Link
                           key={index}
                           to={action.route}
-                          className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-300"
+                          className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-300 m-2"
                         >
                           <div className="flex items-center">
                             <div className={`w-12 h-12 ${action.color} rounded-lg flex items-center justify-center mr-4`}>
@@ -251,24 +258,24 @@ export default function TeacherDashboard() {
                       ))}
                     </div>
 
-                    <div className="w-full sm:w-6/12 lg:w-3/12 px-2 mb-4">
+                    {/* <div className="w-full sm:w-6/12 lg:w-3/12 px-2 mb-4">
                       <button className="w-full bg-emerald-500 text-white px-4 py-3 rounded-lg hover:bg-emerald-600 transition-colors flex items-center justify-center">
                         <i className="fas fa-users mr-2"></i>
                         Quản lý học viên
                       </button>
-                    </div>
-                    <div className="w-full sm:w-6/12 lg:w-3/12 px-2 mb-4">
+                    </div> */}
+                    {/* <div className="w-full sm:w-6/12 lg:w-3/12 px-2 mb-4">
                       <button className="w-full bg-orange-500 text-white px-4 py-3 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center">
                         <i className="fas fa-chart-bar mr-2"></i>
                         Báo cáo chi tiết
                       </button>
-                    </div>
-                    <div className="w-full sm:w-6/12 lg:w-3/12 px-2 mb-4">
+                    </div> */}
+                    {/* <div className="w-full sm:w-6/12 lg:w-3/12 px-2 mb-4">
                       <button className="w-full bg-pink-500 text-white px-4 py-3 rounded-lg hover:bg-pink-600 transition-colors flex items-center justify-center">
                         <i className="fas fa-cog mr-2"></i>
                         Cài đặt hệ thống
                       </button>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>

@@ -17,8 +17,8 @@ export default function CreateListeningLesson() {
     audioUrl: '',
     transcript: '',
     durationSeconds: 0,
-    tags: '',  // ✅ THÊM tags field
-    instructions: 'Listen to the audio and answer the questions below.'  // ✅ THÊM instructions
+    tags: '',
+    instructions: 'Listen to the audio and answer the questions below.'
   });
 
 
@@ -370,14 +370,10 @@ export default function CreateListeningLesson() {
       return;
     }
 
-    // Check questions validation
-    const invalidQuestions = questions.filter(q =>
-      !q.question.trim() ||
-      q.options.some(opt => !opt.trim())
-    );
-
-    if (invalidQuestions.length > 0) {
-      setError('Vui lòng điền đầy đủ câu hỏi và các lựa chọn');
+    // Check questions validation with detailed errors
+    const questionErrors = validateQuestions();
+    if (questionErrors.length > 0) {
+      setError('Lỗi câu hỏi:\n' + questionErrors.join('\n'));
       return;
     }
 
@@ -385,7 +381,7 @@ export default function CreateListeningLesson() {
     setError('');
 
     try {
-      // ✅ Prepare data theo backend DTO format
+      // Bước 1: Tạo lesson
       const lessonCreateDto = {
         title: lessonData.title.trim(),
         description: lessonData.description.trim(),
@@ -397,22 +393,39 @@ export default function CreateListeningLesson() {
       };
 
       console.log('💾 Creating lesson with data:', lessonCreateDto);
+      const lessonResponse = await lessonService.createListeningLesson(lessonCreateDto);
 
-      // ✅ Call real API
-      const response = await lessonService.createListeningLesson(lessonCreateDto);
+      const createdLessonId = lessonResponse.data.id;
+      console.log('✅ Lesson created successfully with ID:', createdLessonId);
 
-      console.log('✅ Lesson created successfully:', response);
+      // Bước 2: Tạo câu hỏi (THÊM LOGIC NÀY)
+      const validQuestions = questions.filter(q =>
+        q.question.trim() &&
+        q.options.every(opt => opt.trim())
+      );
 
-      // ✅ Store lesson ID for vocabulary management
-      setCurrentLessonId(response.data.id);
+      if (validQuestions.length > 0) {
+        console.log(`📝 Creating ${validQuestions.length} questions...`);
+        await lessonService.createQuestionsForLesson(
+          createdLessonId,
+          validQuestions,
+          'LISTENING'
+        );
+        console.log('✅ Questions created successfully');
+      }
 
-      // ✅ Success feedback
-      alert(`✅ Bài học "${lessonData.title}" đã được tạo thành công!\n\nID: ${response.data?.id}\nStatus: ${response.data?.status}`);
+      // Bước 3: Update state và thông báo
+      setCurrentLessonId(createdLessonId);
 
-      // Load vocabularies if this lesson already has some
-      if (response.data.id) {
+      alert(`✅ Bài học "${lessonData.title}" đã được tạo thành công!\n\n` +
+        `ID: ${createdLessonId}\n` +
+        `Status: ${lessonResponse.data?.status}\n` +
+        `Câu hỏi: ${validQuestions.length} câu`);
+
+      // Load vocabularies nếu có
+      if (createdLessonId) {
         try {
-          const vocabResponse = await vocabularyService.getLessonVocabularies(response.data.id);
+          const vocabResponse = await vocabularyService.getLessonVocabularies(createdLessonId);
           setVocabularies(vocabResponse.data || []);
         } catch (error) {
           console.log('No vocabularies found for this lesson');
@@ -422,9 +435,11 @@ export default function CreateListeningLesson() {
     } catch (error) {
       console.error('❌ Save lesson failed:', error);
 
-      // Enhanced error message
+      // Enhanced error handling
       let errorMessage = 'Lưu bài học thất bại';
-      if (error.message.includes('401')) {
+      if (error.message.includes('questions')) {
+        errorMessage = 'Lưu bài học thành công nhưng tạo câu hỏi thất bại. Vui lòng vào "Quản lý câu hỏi" để thêm câu hỏi.';
+      } else if (error.message.includes('401')) {
         errorMessage = 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.';
       } else if (error.message.includes('403')) {
         errorMessage = 'Bạn không có quyền tạo bài học. Cần role TEACHER hoặc ADMIN.';
@@ -438,6 +453,28 @@ export default function CreateListeningLesson() {
     } finally {
       setSaving(false);
     }
+  };
+
+  // Thêm validation function này
+  const validateQuestions = () => {
+    const errors = [];
+
+    questions.forEach((question, index) => {
+      if (!question.question.trim()) {
+        errors.push(`Câu hỏi ${index + 1}: Thiếu nội dung câu hỏi`);
+      }
+
+      const emptyOptions = question.options.filter(opt => !opt.trim());
+      if (emptyOptions.length > 0) {
+        errors.push(`Câu hỏi ${index + 1}: Có ${emptyOptions.length} lựa chọn trống`);
+      }
+
+      if (question.correctAnswer < 0 || question.correctAnswer > 3) {
+        errors.push(`Câu hỏi ${index + 1}: Chưa chọn đáp án đúng`);
+      }
+    });
+
+    return errors;
   };
 
   // ✅ THÊM: Helper function để reset form
@@ -1047,10 +1084,12 @@ export default function CreateListeningLesson() {
                       setLessonData({
                         title: '',
                         description: '',
-                        difficulty: 'beginner',
-                        category: 'conversation',
-                        tags: '',
+                        level: 'A2',
+                        categoryId: null,
+                        audioUrl: '',
                         transcript: '',
+                        durationSeconds: 0,
+                        tags: '',
                         instructions: 'Listen to the audio and answer the questions below.'
                       });
                       setSelectedFile(null);

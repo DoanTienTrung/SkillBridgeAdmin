@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FaHeadphones, FaBookOpen, FaCheck, FaArrowRight, FaPlusCircle, FaList, FaArrowLeft, FaQuestion } from "react-icons/fa";
+
 
 export default function LessonTypeSelector() {
   const lessonTypes = [
@@ -62,25 +64,7 @@ export default function LessonTypeSelector() {
           {/* Content */}
           <div className="px-6 py-6">
             
-            {/* Quick Stats */}
-            <div className="bg-blueGray-50 rounded-lg p-4 mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <div className="text-2xl font-bold text-lightBlue-500">2</div>
-                  <div className="text-sm text-blueGray-600">Loại bài học</div>
-                </div>
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <div className="text-2xl font-bold text-green-500">
-                    <i className="fas fa-infinity"></i>
-                  </div>
-                  <div className="text-sm text-blueGray-600">Không giới hạn</div>
-                </div>
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <div className="text-2xl font-bold text-orange-500">4</div>
-                  <div className="text-sm text-blueGray-600">Cấp độ hỗ trợ</div>
-                </div>
-              </div>
-            </div>
+            
 
             {/* Lesson Type Cards */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -122,7 +106,7 @@ export default function LessonTypeSelector() {
                   {/* Action Button */}
                   <Link
                     to={lesson.route}
-                    className={`w-full ${lesson.color} ${lesson.hoverColor} text-white font-medium py-3 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center group-hover:shadow-md`}
+                    className={`w-full ${lesson.color} ${lesson.hoverColor}  text-black font-medium py-3 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center group-hover:shadow-md`}
                   >
                     <i className="fas fa-arrow-right mr-2"></i>
                     Tạo {lesson.title}
