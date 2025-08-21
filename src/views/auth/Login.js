@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 import authService from "../../services/authService";
-import ApiStatus from "../../components/Status/ApiStatus";
+
 
 export default function Login() {
   const history = useHistory();
@@ -40,12 +40,12 @@ export default function Login() {
   const redirectBasedOnRole = () => {
     const user = authService.getCurrentUserFromToken();
     if (user) {
-      if (user.role === 'ADMIN' || user.role === 'TEACHER') {
+      if (user.role === 'ADMIN') {
         history.push('/admin/dashboard');
       } else if (user.role === 'STUDENT') {
         history.push('/student/dashboard'); // Redirect students to student dashboard
       } else {
-        history.push('/'); // Default fallback
+        history.push('/teacher/dashboard'); // Default fallback
       }
     }
   };
@@ -240,12 +240,12 @@ export default function Login() {
                 </form>
 
                 {/* API Status Indicator */}
-                <div className="mt-4 text-center">
+                {/* <div className="mt-4 text-center">
                   <div className="inline-flex items-center text-xs text-blueGray-500">
                     <span className="mr-2">API Status:</span>
                     <ApiStatus />
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
 

@@ -22,7 +22,8 @@ ReactDOM.render(
   <HashRouter>
     <Switch>
       {/* add routes with layouts */}
-      <Route path="/admin" component={TeacherAdmin} />
+      <Route path="/admin" component={Admin} />
+      <Route path="/teacher" component={TeacherAdmin} />
       <Route path="/student" component={Student} />
       <Route path="/auth" component={Auth} />
       {/* add routes without layouts */}

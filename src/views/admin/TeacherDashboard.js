@@ -15,28 +15,28 @@ const quickActions = [
     description: 'Tạo bài nghe hoặc bài đọc',
     icon: 'fas fa-plus-circle',
     color: 'bg-lightBlue-500',
-    route: '/admin/create-lesson'
+    route: '/teacher/create-lesson'
   },
   {
     title: 'Quản lý bài học',
     description: 'Xem và chỉnh sửa bài học',
     icon: 'fas fa-book-open',
     color: 'bg-purple-500',
-    route: '/admin/lessons'
+    route: '/teacher/lessons'
   },
   {
     title: 'Xem báo cáo',
     description: 'Thống kê và phân tích',
     icon: 'fas fa-chart-line',
     color: 'bg-orange-500',
-    route: '/admin/reports'
+    route: '/teacher/reports'
   },
   {
     title: 'Cài đặt hệ thống',
     description: 'Cài đặt hệ thống',
     icon: 'fas fa-cog',
     color: 'bg-orange-500',
-    route: '/admin/system'
+    route: '/teacher/system'
   }
 ];
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaHeadphones, FaBookOpen, FaCheck, FaArrowRight, FaPlusCircle, FaList, FaArrowLeft, FaQuestion } from "react-icons/fa";
+
 
 
 export default function LessonTypeSelector() {
@@ -13,7 +13,7 @@ export default function LessonTypeSelector() {
       color: 'bg-blue-500',
       hoverColor: 'hover:bg-blue-600',
       borderColor: 'border-blue-200',
-      route: '/admin/create-listening',
+      route: '/teacher/create-listening',
       features: [
         'Upload file audio (MP3, WAV)',
         'Transcript đầy đủ', 
@@ -30,7 +30,7 @@ export default function LessonTypeSelector() {
       color: 'bg-green-500',
       hoverColor: 'hover:bg-green-600',
       borderColor: 'border-green-200',
-      route: '/admin/create-reading',
+      route: '/teacher/create-reading',
       features: [
         'Soạn thảo với rich text editor',
         'Upload file văn bản (.txt)',
@@ -156,14 +156,14 @@ export default function LessonTypeSelector() {
             {/* Quick Actions */}
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
-                to="/admin/lessons"
+                to="/teacher/lessons"
                 className="bg-blueGray-500 hover:bg-blueGray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-300"
               >
                 <i className="fas fa-list mr-2"></i>
                 Xem bài học đã tạo
               </Link>
               <Link
-                to="/admin/dashboard"
+                to="/teacher/dashboard"
                 className="bg-white border border-blueGray-300 hover:border-blueGray-400 text-blueGray-700 px-4 py-2 rounded-lg text-sm transition-colors duration-300"
               >
                 <i className="fas fa-arrow-left mr-2"></i>

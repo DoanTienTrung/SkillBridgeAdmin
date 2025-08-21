@@ -15,7 +15,7 @@ import ReadingLesson from "views/student/ReadingLesson.js";
 import VocabularyManager from "views/student/VocabularyManager.js";
 import ProgressTracker from "views/student/ProgressTracker.js";
 import QuizInterface from "views/student/QuizInterface.js";
-
+import ProfileManagement from "views/admin/ProfileManagement";
 export default function Student() {
   return (
     <>
@@ -33,6 +33,7 @@ export default function Student() {
             <Route path="/student/quiz/:lessonId" component={QuizInterface} />
             <Route path="/student/vocabulary" component={VocabularyManager} />
             <Route path="/student/progress" component={ProgressTracker} />
+            <Route path="/student/profile" exact component={ProfileManagement} />
             {/* TODO: Add more student routes here later */}
             <Redirect from="/student" to="/student/dashboard" />
           </Switch>

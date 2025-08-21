@@ -19,6 +19,12 @@ export const API_ENDPOINTS = {
   STUDENTS: '/users/students',
   USER_BY_ID: (id) => `/users/${id}`,
   TOGGLE_USER: (id) => `/users/${id}/toggle-active`,
+  USERS: '/users',
+  CREATE_USER: '/users',
+  UPDATE_USER: (id) => `/users/${id}`,
+  DELETE_USER: (id) => `/users/${id}`,
+  RESET_PASSWORD: (id) => `/users/${id}/reset-password`,
+  TOGGLE_USER_STATUS: (id) => `/users/${id}/toggle-status`,
   
   // Listening Lessons
   LISTENING_LESSONS: '/listening-lessons',

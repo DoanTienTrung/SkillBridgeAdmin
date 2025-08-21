@@ -1,5 +1,6 @@
 import httpClient from './httpClient';
 import { API_ENDPOINTS } from './config';
+import userService from './userService';
 
 /**
  * Authentication Service với Real API Integration
@@ -345,3 +346,4 @@ ERROR_MESSAGES = {
 const authService = new AuthService();
 
 export default authService;
+export { userService };

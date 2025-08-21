@@ -10,12 +10,12 @@ import HeaderStats from "components/Headers/HeaderStats.js";
 import FooterAdmin from "components/Footers/FooterAdmin.js";
 
 // guards
-import AdminRoute from "components/Guards/AdminRoute.js";
+import TeacherRoute from "components/Guards/TeacherRoute.js";
 
 // views
 import TeacherDashboard from "views/admin/TeacherDashboard.js";
 import ProfileManagement from "views/admin/ProfileManagement.js";
-import AudioUploadTest from "views/admin/AudioUploadTest.js";
+
 
 // THÊM IMPORT MỚI
 import LessonTypeSelector from "views/admin/LessonTypeSelector.js";
@@ -37,25 +37,24 @@ export default function TeacherAdmin() {
         <div className="px-4 md:px-10 mx-auto w-full -m-24">
           <Switch>
             {/* Dashboard */}
-            <AdminRoute path="/admin/dashboard" exact component={TeacherDashboard} />
-            <AdminRoute path="/admin/profile" exact component={ProfileManagement} />
+            <TeacherRoute path="/teacher/dashboard" exact component={TeacherDashboard} />
+            <TeacherRoute path="/teacher/profile" exact component={ProfileManagement} />
 
             {/* Lesson Creation Workflow */}
-            <AdminRoute path="/admin/create-lesson" exact component={LessonTypeSelector} />
-            <AdminRoute path="/admin/create-listening" exact component={CreateListeningLesson} />
-            <AdminRoute path="/admin/create-reading" exact component={CreateReadingLesson} />
+            <TeacherRoute path="/teacher/create-lesson" exact component={LessonTypeSelector} />
+            <TeacherRoute path="/teacher/create-listening" exact component={CreateListeningLesson} />
+            <TeacherRoute path="/teacher/create-reading" exact component={CreateReadingLesson} />
 
             {/* Lesson Management */}
-            <AdminRoute path="/admin/lessons" exact component={LessonManagement} />
+            <TeacherRoute path="/teacher/lessons" exact component={LessonManagement} />
 
             {/* Other features */}
-            <AdminRoute path="/admin/test-upload" exact component={AudioUploadTest} />
-            <AdminRoute path="/admin/students" exact component={Tables} />
-            <AdminRoute path="/admin/reports" exact component={Maps} />
-            <AdminRoute path="/admin/settings" exact component={Settings} />
+            <TeacherRoute path="/teacher/students" exact component={Tables} />
+            <TeacherRoute path="/teacher/reports" exact component={Maps} />
+            <TeacherRoute path="/teacher/settings" exact component={Settings} />
 
             {/* Default redirect */}
-            <Redirect from="/admin" to="/admin/dashboard" />
+            <Redirect from="/teacher" to="/teacher/dashboard" />
           </Switch>
           <FooterAdmin />
         </div>

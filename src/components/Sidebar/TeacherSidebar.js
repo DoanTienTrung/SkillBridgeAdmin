@@ -76,7 +76,7 @@ export default function TeacherSidebar() {
                 <div className="w-6/12">
                   <Link
                     className="md:block text-left md:pb-2 text-blueGray-600 mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0"
-                    to="/admin/dashboard"
+                    to="/teacher/dashboard"
                   >
                     SkillBridge
                   </Link>
@@ -136,16 +136,16 @@ export default function TeacherSidebar() {
                 <Link
                   className={
                     "text-xs uppercase py-3 font-bold block " +
-                    (isActive("/admin/dashboard")
+                    (isActive("/teacher/dashboard")
                       ? "text-lightBlue-500 hover:text-lightBlue-600"
                       : "text-blueGray-700 hover:text-blueGray-500")
                   }
-                  to="/admin/dashboard"
+                  to="/teacher/dashboard"
                 >
                   <i
                     className={
                       "fas fa-tv mr-2 text-sm " +
-                      (isActive("/admin/dashboard")
+                      (isActive("/teacher/dashboard")
                         ? "opacity-75"
                         : "text-blueGray-300")
                     }
@@ -158,16 +158,16 @@ export default function TeacherSidebar() {
                 <Link
                   className={
                     "text-xs uppercase py-3 font-bold block " +
-                    (isActive("/admin/profile")
+                    (isActive("/teacher/profile")
                       ? "text-lightBlue-500 hover:text-lightBlue-600"
                       : "text-blueGray-700 hover:text-blueGray-500")
                   }
-                  to="/admin/profile"
+                  to="/teacher/profile"
                 >
                   <i
                     className={
                       "fas fa-user-circle mr-2 text-sm " +
-                      (isActive("/admin/profile")
+                      (isActive("/teacher/profile")
                         ? "opacity-75"
                         : "text-blueGray-300")
                     }
@@ -185,16 +185,16 @@ export default function TeacherSidebar() {
               <Link
                 className={
                   "text-xs uppercase py-3 font-bold block " +
-                  (isActive("/admin/create-lesson")
+                  (isActive("/teacher/create-lesson")
                     ? "text-lightBlue-500 hover:text-lightBlue-600"
                     : "text-blueGray-700 hover:text-blueGray-500")
                 }
-                to="/admin/create-lesson"
+                to="/teacher/create-lesson"
               >
                 <i
                   className={
                     "fas fa-plus-circle mr-2 text-sm " +
-                    (isActive("/admin/create-lesson")
+                    (isActive("/teacher/create-lesson")
                       ? "opacity-75"
                       : "text-blueGray-300")
                   }
@@ -204,27 +204,7 @@ export default function TeacherSidebar() {
             </li>
 
             <ul className="md:flex-col md:min-w-full flex flex-col list-none">
-              <li className="items-center">
-                <Link
-                  className={
-                    "text-xs uppercase py-3 font-bold block " +
-                    (isActive("/admin/test-upload")
-                      ? "text-lightBlue-500 hover:text-lightBlue-600"
-                      : "text-blueGray-700 hover:text-blueGray-500")
-                  }
-                  to="/admin/test-upload"
-                >
-                  <i
-                    className={
-                      "fas fa-upload mr-2 text-sm " +
-                      (isActive("/admin/test-upload")
-                        ? "opacity-75"
-                        : "text-blueGray-300")
-                    }
-                  ></i>{" "}
-                  Test Upload Audio
-                </Link>
-              </li>
+              
 
 
 
@@ -232,16 +212,16 @@ export default function TeacherSidebar() {
                 <Link
                   className={
                     "text-xs uppercase py-3 font-bold block " +
-                    (isActive("/admin/lessons")
+                    (isActive("/teacher/lessons")
                       ? "text-lightBlue-500 hover:text-lightBlue-600"
                       : "text-blueGray-700 hover:text-blueGray-500")
                   }
-                  to="/admin/lessons"
+                  to="/teacher/lessons"
                 >
                   <i
                     className={
                       "fas fa-book-open mr-2 text-sm " +
-                      (isActive("/admin/lessons")
+                      (isActive("/teacher/lessons")
                         ? "opacity-75"
                         : "text-blueGray-300")
                     }
@@ -254,16 +234,16 @@ export default function TeacherSidebar() {
                 <Link
                   className={
                     "text-xs uppercase py-3 font-bold block " +
-                    (isActive("/admin/students")
+                    (isActive("/teacher/students")
                       ? "text-lightBlue-500 hover:text-lightBlue-600"
                       : "text-blueGray-700 hover:text-blueGray-500")
                   }
-                  to="/admin/students"
+                  to="/teacher/students"
                 >
                   <i
                     className={
                       "fas fa-users mr-2 text-sm " +
-                      (isActive("/admin/students")
+                      (isActive("/teacher/students")
                         ? "opacity-75"
                         : "text-blueGray-300")
                     }
@@ -276,16 +256,16 @@ export default function TeacherSidebar() {
                 <Link
                   className={
                     "text-xs uppercase py-3 font-bold block " +
-                    (isActive("/admin/reports")
+                    (isActive("/teacher/reports")
                       ? "text-lightBlue-500 hover:text-lightBlue-600"
                       : "text-blueGray-700 hover:text-blueGray-500")
                   }
-                  to="/admin/reports"
+                  to="/teacher/reports"
                 >
                   <i
                     className={
                       "fas fa-chart-line mr-2 text-sm " +
-                      (isActive("/admin/reports")
+                      (isActive("/teacher/reports")
                         ? "opacity-75"
                         : "text-blueGray-300")
                     }
@@ -296,7 +276,7 @@ export default function TeacherSidebar() {
             </ul>
 
             {/* Admin Only Section */}
-            {currentUser?.role === 'ADMIN' && (
+            {currentUser?.role === 'TEACHER' && (
               <>
                 <hr className="my-4 md:min-w-full" />
                 <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
@@ -308,16 +288,16 @@ export default function TeacherSidebar() {
                     <Link
                       className={
                         "text-xs uppercase py-3 font-bold block " +
-                        (isActive("/admin/settings")
+                        (isActive("/teacher/settings")
                           ? "text-lightBlue-500 hover:text-lightBlue-600"
                           : "text-blueGray-700 hover:text-blueGray-500")
                       }
-                      to="/admin/settings"
+                      to="/teacher/settings"
                     >
                       <i
                         className={
                           "fas fa-cogs mr-2 text-sm " +
-                          (isActive("/admin/settings")
+                          (isActive("/teacher/settings")
                             ? "opacity-75"
                             : "text-blueGray-300")
                         }
@@ -338,7 +318,7 @@ export default function TeacherSidebar() {
             </h6>
 
             <ul className="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
-              <Link to="/admin/create-lesson">
+              <Link to="/teacher/create-lesson">
                 <i className="fas fa-plus text-blueGray-400 mr-2 text-sm"></i>
                 Tạo bài học
               </Link>
