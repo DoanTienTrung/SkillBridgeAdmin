@@ -16,6 +16,8 @@ export const API_ENDPOINTS = {
   
   // Users
   PROFILE: '/users/profile',
+  CHANGE_PASSWORD: '/users/change-password',
+  UPDATE_AVATAR: '/users/avatar',
   STUDENTS: '/users/students',
   USER_BY_ID: (id) => `/users/${id}`,
   TOGGLE_USER: (id) => `/users/${id}/toggle-active`,
@@ -25,6 +27,10 @@ export const API_ENDPOINTS = {
   DELETE_USER: (id) => `/users/${id}`,
   RESET_PASSWORD: (id) => `/users/${id}/reset-password`,
   TOGGLE_USER_STATUS: (id) => `/users/${id}/toggle-status`,
+  
+  // File Uploads
+  UPLOAD_AVATAR: '/upload/avatar',
+  UPLOAD_IMAGES: '/upload/images',
   
   // Listening Lessons
   LISTENING_LESSONS: '/listening-lessons',

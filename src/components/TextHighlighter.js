@@ -2,15 +2,19 @@ import React, { useState, useRef, useEffect } from 'react';
 
 export default function TextHighlighter({ 
   text, 
-  vocabularies, 
+  vocabularies = [], 
   onTextSelect, 
-  readOnly = false 
+  onWordClick,
+  readOnly = false,
+  fontSize = 16,
+  className = ''
 }) {
   const [selection, setSelection] = useState(null);
   const textRef = useRef();
 
+  // Handle text selection for highlighting
   const handleMouseUp = () => {
-    if (readOnly) return;
+    if (readOnly || !onTextSelect) return;
 
     const selection = window.getSelection();
     if (selection.rangeCount === 0) return;
@@ -22,7 +26,6 @@ export default function TextHighlighter({
 
     // Calculate positions relative to the text container
     const textElement = textRef.current;
-    const textContent = textElement.textContent;
     
     const startOffset = getTextOffset(textElement, range.startContainer, range.startOffset);
     const endOffset = getTextOffset(textElement, range.endContainer, range.endOffset);
@@ -37,6 +40,14 @@ export default function TextHighlighter({
 
     // Clear selection
     selection.removeAllRanges();
+  };
+  
+  // Handle word click for dictionary lookup
+  const handleWordClick = (e, word) => {
+    if (!onWordClick) return;
+    
+    e.stopPropagation();
+    onWordClick(word.trim());
   };
 
   const getTextOffset = (container, node, offset) => {

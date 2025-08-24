@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import authService from "../../services/authService";
+import AvatarUpload from "../../components/AvatarUpload";
+
 
 export default function ProfileManagement() {
   const [currentUser, setCurrentUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
-  
+
   const [profileData, setProfileData] = useState({
     fullName: '',
     email: '',
@@ -40,7 +42,7 @@ export default function ProfileManagement() {
         avatarUrl: userData.avatarUrl || ''
       });
     } catch (error) {
-      console.error('Error loading profile:', error);
+      console.error('Error loading profile: - ProfileManagement.js:45', error);
       setMessage({ type: 'error', text: 'Không thể tải thông tin hồ sơ' });
     } finally {
       setLoading(false);
@@ -67,16 +69,16 @@ export default function ProfileManagement() {
     e.preventDefault();
     try {
       setLoading(true);
-      
+
       // Call real API
       const updatedUser = await authService.updateProfile(profileData);
-      
+
       setMessage({ type: 'success', text: 'Cập nhật thông tin thành công!' });
       setIsEditing(false);
       setCurrentUser(updatedUser);
-      
+
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error('Error updating profile: - ProfileManagement.js:81', error);
       setMessage({ type: 'error', text: error.message || 'Cập nhật thông tin thất bại' });
     } finally {
       setLoading(false);
@@ -84,10 +86,12 @@ export default function ProfileManagement() {
   };
 
   const handleChangePassword = async (e) => {
+    // console.log('hanale password - ProfileManagement.js:87')
     e.preventDefault();
-    
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setMessage({ type: 'error', text: 'Mật khẩu xác nhận không khớp' });
+      console.log({ type: 'error - ProfileManagement.js:94', text: 'Mật khẩu xác nhận không khớp' });
       return;
     }
 
@@ -98,13 +102,14 @@ export default function ProfileManagement() {
 
     try {
       setLoading(true);
-      
+
       // Call real API
       const result = await authService.changePassword({
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword
+        "currentPassword": passwordData.currentPassword,
+        "newPassword": passwordData.newPassword,
+        "confirmPassword": passwordData.confirmPassword
       });
-      
+
       setMessage({ type: 'success', text: result || 'Đổi mật khẩu thành công!' });
       setPasswordData({
         currentPassword: '',
@@ -112,7 +117,7 @@ export default function ProfileManagement() {
         confirmPassword: ''
       });
     } catch (error) {
-      console.error('Error changing password:', error);
+      console.error('Error changing password: - ProfileManagement.js:120', error);
       setMessage({ type: 'error', text: error.message || 'Đổi mật khẩu thất bại' });
     } finally {
       setLoading(false);
@@ -193,15 +198,14 @@ export default function ProfileManagement() {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex-auto px-4 lg:px-10 py-10 pt-0">
               {/* Message Display */}
               {message.text && (
-                <div className={`mb-4 p-4 rounded ${
-                  message.type === 'success' 
-                    ? 'bg-green-100 border border-green-400 text-green-700' 
+                <div className={`mb-4 p-4 rounded ${message.type === 'success'
+                    ? 'bg-green-100 border border-green-400 text-green-700'
                     : 'bg-red-100 border border-red-400 text-red-700'
-                }`}>
+                  }`}>
                   {message.text}
                 </div>
               )}
@@ -316,19 +320,24 @@ export default function ProfileManagement() {
                     </div>
                   </div>
                   <div className="w-full lg:w-6/12 px-3">
-                    <div className="relative w-full mb-3">
-                      <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
-                        URL Avatar
-                      </label>
-                      <input
-                        type="url"
-                        name="avatarUrl"
-                        value={profileData.avatarUrl}
-                        onChange={handleProfileChange}
-                        className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                        disabled={!isEditing}
-                        placeholder="https://example.com/avatar.jpg"
-                      />
+                    <div className="w-full lg:w-6/12 px-3">
+                      <div className="relative w-full mb-3">
+                        <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
+                          Ảnh đại diện
+                        </label>
+                        {/* Import AvatarUpload component */}
+                        <AvatarUpload
+                          user={currentUser}
+                          onAvatarUpdate={(updatedUser) => {
+                            setCurrentUser(updatedUser);
+                            setProfileData(prev => ({
+                              ...prev,
+                              avatarUrl: updatedUser.avatarUrl
+                            }));
+                          }}
+                          className="text-left"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -345,7 +354,7 @@ export default function ProfileManagement() {
                 </h6>
               </div>
             </div>
-            
+
             <div className="flex-auto px-4 lg:px-10 py-10 pt-0">
               <form onSubmit={handleChangePassword}>
                 <div className="flex flex-wrap">
@@ -432,7 +441,7 @@ export default function ProfileManagement() {
                         }}
                       />
                     ) : null}
-                    <div 
+                    <div
                       className={`${profileData.avatarUrl ? 'hidden' : 'flex'} shadow-xl rounded-full h-32 w-32 bg-blueGray-200 absolute -m-16 -ml-20 lg:-ml-16 items-center justify-center`}
                     >
                       <i className="fas fa-user text-blueGray-400 text-4xl"></i>
@@ -476,7 +485,7 @@ export default function ProfileManagement() {
                 <div className="flex flex-wrap justify-center">
                   <div className="w-full px-4">
                     <p className="mb-4 text-sm leading-relaxed text-blueGray-700">
-                      Thông tin hồ sơ của bạn sẽ được hiển thị cho học viên và đồng nghiệp. 
+                      Thông tin hồ sơ của bạn sẽ được hiển thị cho học viên và đồng nghiệp.
                       Hãy đảm bảo thông tin luôn được cập nhật và chính xác.
                     </p>
                   </div>
