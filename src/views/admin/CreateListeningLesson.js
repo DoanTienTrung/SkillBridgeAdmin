@@ -71,40 +71,40 @@ export default function CreateListeningLesson() {
     const loadCategories = async () => {
       try {
         setLoadingCategories(true);
-        console.log('🔄 Loading categories...');
+        console.log('🔄 Loading categories... - CreateListeningLesson.js:74');
 
         const response = await lessonService.getCategories();
 
-        console.log('📡 API Response:', response);
-        console.log('📂 Categories data:', response.data);
+        console.log('📡 API Response: - CreateListeningLesson.js:78', response);
+        console.log('📂 Categories data: - CreateListeningLesson.js:79', response.data);
 
         setCategories(response || []);
 
         if (response.data && response.data.length > 0) {
-          console.log('✅ Successfully loaded', response.data.length, 'categories');
+          console.log('✅ Successfully loaded - CreateListeningLesson.js:84', response.data.length, 'categories');
         } else {
-          console.warn('⚠️ No categories returned from API');
+          console.warn('⚠️ No categories returned from API - CreateListeningLesson.js:86');
         }
 
       } catch (error) {
-        console.error('❌ Failed to load categories:', error);
+        console.error('❌ Failed to load categories: - CreateListeningLesson.js:90', error);
         setError('Không thể tải danh sách thể loại. Vui lòng reload trang.');
       } finally {
         setLoadingCategories(false);
-        console.log('🏁 Finished loading categories');
+        console.log('🏁 Finished loading categories - CreateListeningLesson.js:94');
       }
     };
 
     loadCategories();
   }, []);
 
-  const tabs = [
-    { id: 'basic', name: 'Thông tin cơ bản', icon: 'fa-info-circle' },
-    { id: 'audio', name: 'File âm thanh', icon: 'fa-volume-up' },
-    { id: 'vocabulary', name: 'Từ vựng', icon: 'fa-book' }, // THÊM TAB MỚI
-    { id: 'questions', name: 'Câu hỏi', icon: 'fa-question-circle' },
-    { id: 'transcript', name: 'Transcript', icon: 'fa-file-text' }
-  ];
+  // const tabs = [
+  //   { id: 'basic', name: 'Thông tin cơ bản', icon: 'fa-info-circle' },
+  //   { id: 'audio', name: 'File âm thanh', icon: 'fa-volume-up' },
+  //   { id: 'vocabulary', name: 'Từ vựng', icon: 'fa-book' }, // THÊM TAB MỚI
+  //   { id: 'questions', name: 'Câu hỏi', icon: 'fa-question-circle' },
+  //   { id: 'transcript', name: 'Transcript', icon: 'fa-file-text' }
+  // ];
   const handleTextSelect = (selection) => {
     setVocabularyModal({
       isOpen: true,
@@ -125,9 +125,9 @@ export default function CreateListeningLesson() {
       // Thêm vào danh sách vocabulary local
       setVocabularies(prev => [...prev, response.data]);
 
-      console.log('✅ Vocabulary added successfully');
+      console.log('✅ Vocabulary added successfully - CreateListeningLesson.js:128');
     } catch (error) {
-      console.error('❌ Failed to add vocabulary:', error);
+      console.error('❌ Failed to add vocabulary: - CreateListeningLesson.js:130', error);
       throw error;
     }
   };
@@ -141,9 +141,9 @@ export default function CreateListeningLesson() {
       // Xóa khỏi danh sách local
       setVocabularies(prev => prev.filter(v => v.id !== vocabularyId));
 
-      console.log('✅ Vocabulary deleted successfully');
+      console.log('✅ Vocabulary deleted successfully - CreateListeningLesson.js:144');
     } catch (error) {
-      console.error('❌ Failed to delete vocabulary:', error);
+      console.error('❌ Failed to delete vocabulary: - CreateListeningLesson.js:146', error);
       alert('Lỗi khi xóa từ vựng: ' + error.message);
     }
   };
@@ -160,7 +160,7 @@ export default function CreateListeningLesson() {
       const response = await lessonService.getPreviewData(currentLessonId);
       setPreviewData(response.data);
     } catch (error) {
-      console.error('❌ Failed to load preview:', error);
+      console.error('❌ Failed to load preview: - CreateListeningLesson.js:163', error);
       alert('Lỗi khi tải preview: ' + error.message);
       setPreviewModal(false);
     }
@@ -181,7 +181,7 @@ export default function CreateListeningLesson() {
       const response = await lessonService.getPreviewData(currentLessonId);
       setPreviewData(response.data);
     } catch (error) {
-      console.error('❌ Failed to publish lesson:', error);
+      console.error('❌ Failed to publish lesson: - CreateListeningLesson.js:184', error);
       alert('Lỗi khi xuất bản bài học: ' + error.message);
     }
   };
@@ -199,7 +199,7 @@ export default function CreateListeningLesson() {
   const handleFileSelect = (file) => {
     if (!file) return;
 
-    console.log('🎵 Selected audio file:', file.name);
+    console.log('🎵 Selected audio file: - CreateListeningLesson.js:202', file.name);
 
     setError('');
     setUploadResult(null);
@@ -215,10 +215,10 @@ export default function CreateListeningLesson() {
       audioService.getAudioDuration(file)
         .then(duration => {
           setAudioDuration(duration);
-          console.log('🎧 Audio duration:', duration);
+          console.log('🎧 Audio duration: - CreateListeningLesson.js:218', duration);
         })
         .catch(err => {
-          console.warn('Could not get audio duration:', err.message);
+          console.warn('Could not get audio duration: - CreateListeningLesson.js:221', err.message);
           setAudioDuration('Unknown');
         });
     } else {
@@ -263,7 +263,7 @@ export default function CreateListeningLesson() {
     setError('');
 
     try {
-      console.log('🚀 Starting audio upload:', selectedFile.name);
+      console.log('🚀 Starting audio upload: - CreateListeningLesson.js:266', selectedFile.name);
 
       const result = await audioService.uploadAudio(selectedFile, (progress) => {
         setUploadProgress(progress);
@@ -271,13 +271,13 @@ export default function CreateListeningLesson() {
 
       setUploadResult(result);
 
-      // ✅ THÊM: Sync audioUrl vào lessonData
+      
       setLessonData(prev => ({
         ...prev,
         audioUrl: result.audioUrl
       }));
 
-      // ✅ THÊM: Sync duration nếu có
+      
       if (audioDuration && audioDuration !== 'Unknown') {
         const durationInSeconds = parseDuration(audioDuration);
         setLessonData(prev => ({
@@ -286,10 +286,10 @@ export default function CreateListeningLesson() {
         }));
       }
 
-      console.log('✅ Audio uploaded successfully:', result);
+      console.log('✅ Audio uploaded successfully: - CreateListeningLesson.js:289', result);
 
     } catch (error) {
-      console.error('❌ Audio upload failed:', error);
+      console.error('❌ Audio upload failed: - CreateListeningLesson.js:292', error);
 
       if (error instanceof AudioUploadError) {
         setError(`${error.message} (Code: ${error.code})`);
@@ -392,11 +392,11 @@ export default function CreateListeningLesson() {
         durationSeconds: lessonData.durationSeconds || 0
       };
 
-      console.log('💾 Creating lesson with data:', lessonCreateDto);
+      console.log('💾 Creating lesson with data: - CreateListeningLesson.js:395', lessonCreateDto);
       const lessonResponse = await lessonService.createListeningLesson(lessonCreateDto);
 
       const createdLessonId = lessonResponse.data.id;
-      console.log('✅ Lesson created successfully with ID:', createdLessonId);
+      console.log('✅ Lesson created successfully with ID: - CreateListeningLesson.js:399', createdLessonId);
 
       // Bước 2: Tạo câu hỏi (THÊM LOGIC NÀY)
       const validQuestions = questions.filter(q =>
@@ -405,13 +405,13 @@ export default function CreateListeningLesson() {
       );
 
       if (validQuestions.length > 0) {
-        console.log(`📝 Creating ${validQuestions.length} questions...`);
+        console.log(`📝 Creating ${validQuestions.length} questions... - CreateListeningLesson.js:408`);
         await lessonService.createQuestionsForLesson(
           createdLessonId,
           validQuestions,
           'LISTENING'
         );
-        console.log('✅ Questions created successfully');
+        console.log('✅ Questions created successfully - CreateListeningLesson.js:414');
       }
 
       // Bước 3: Update state và thông báo
@@ -428,12 +428,12 @@ export default function CreateListeningLesson() {
           const vocabResponse = await vocabularyService.getLessonVocabularies(createdLessonId);
           setVocabularies(vocabResponse.data || []);
         } catch (error) {
-          console.log('No vocabularies found for this lesson');
+          console.log('No vocabularies found for this lesson - CreateListeningLesson.js:431');
         }
       }
 
     } catch (error) {
-      console.error('❌ Save lesson failed:', error);
+      console.error('❌ Save lesson failed: - CreateListeningLesson.js:436', error);
 
       // Enhanced error handling
       let errorMessage = 'Lưu bài học thất bại';
@@ -723,57 +723,62 @@ export default function CreateListeningLesson() {
                     </div>
                   </div>
 
-                  {/* Vocabulary List */}
                   {vocabularies.length > 0 && (
                     <div className="bg-white border rounded-lg">
-                      <div className="px-6 py-4 border-b border-gray-200">
-                        <h4 className="text-md font-semibold text-gray-700">
-                          Danh sách từ vựng đã thêm
+                      <div className="px-4 py-3 border-b bg-gray-50">
+                        <h4 className="font-semibold text-gray-700">
+                          Từ vựng đã thêm ({vocabularies.length})
                         </h4>
                       </div>
-                      <div className="divide-y divide-gray-200">
-                        {vocabularies.map((vocab) => (
-                          <div key={vocab.id} className="px-6 py-4 flex items-start justify-between">
+                      <div className="p-4 space-y-3 max-h-64 overflow-y-auto">
+                        {vocabularies.map((vocab, index) => (
+                          <div key={vocab.id} className="flex items-start justify-between p-3 bg-gray-50 rounded border">
                             <div className="flex-1">
+                              {/* Word với màu highlight */}
                               <div className="flex items-center gap-3 mb-2">
                                 <span
-                                  className="inline-block w-4 h-4 rounded"
-                                  style={{ backgroundColor: vocab.highlightColor }}
-                                ></span>
-                                <span className="font-semibold text-gray-800">
+                                  className="px-3 py-1 rounded font-bold text-black border"
+                                  style={{
+                                    backgroundColor: vocab.highlightColor,
+                                    borderColor: 'rgba(0,0,0,0.2)'
+                                  }}
+                                >
                                   {vocab.word}
                                 </span>
                                 {vocab.phonetic && (
-                                  <span className="text-sm text-gray-500">
+                                  <span className="text-sm text-gray-600 font-mono">
                                     {vocab.phonetic}
                                   </span>
                                 )}
                               </div>
-                              <p className="text-gray-600 text-sm mb-2">
-                                {vocab.meaning}
+
+                              {/* Meaning */}
+                              <p className="text-gray-700 text-sm mb-1">
+                                <strong>Nghĩa:</strong> {vocab.meaning}
                               </p>
-                              {vocab.selectedText && (
-                                <p className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                                  "{vocab.selectedText}"
-                                </p>
-                              )}
+
+                              {/* Example nếu có */}
                               {vocab.exampleSentence && (
-                                <p className="text-xs text-gray-500 italic mt-2">
-                                  Ví dụ: {vocab.exampleSentence}
+                                <p className="text-gray-600 text-sm italic">
+                                  <strong>VD:</strong> {vocab.exampleSentence}
                                 </p>
                               )}
                             </div>
+
+                            {/* Delete button */}
                             <button
                               onClick={() => handleDeleteVocabulary(vocab.id)}
-                              className="text-red-500 hover:text-red-700 p-2"
+                              className="text-red-500 hover:text-red-700 p-1"
+                              title="Xóa"
                             >
-                              <i className="fas fa-trash"></i>
+                              <i className="fas fa-trash text-sm"></i>
                             </button>
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
+
                 </div>
               )}
 

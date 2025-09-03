@@ -134,6 +134,21 @@ class ReadingService {
     return words.filter(word => word.length > 0).length;
   }
 
+  // Create question for reading lesson
+  async createQuestion(questionData) {
+    try {
+      console.log('📤 Creating question:', questionData);
+      
+      const response = await httpClient.post(API_ENDPOINTS.QUESTIONS, questionData);
+      
+      console.log('✅ Question created successfully:', response);
+      return response;
+    } catch (error) {
+      console.error('❌ Failed to create question:', error);
+      throw error;
+    }
+  }
+
   // Get categories (reuse from lessonService)
   async getCategories() {
     try {

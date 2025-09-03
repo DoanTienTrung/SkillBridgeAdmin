@@ -17,13 +17,13 @@ export default function VocabularyModal({
   const [saving, setSaving] = useState(false);
 
   const colors = [
-    { name: 'Vàng', value: '#ffeb3b' },
-    { name: 'Xanh lá', value: '#4caf50' },
-    { name: 'Xanh dương', value: '#2196f3' },
-    { name: 'Tím', value: '#9c27b0' },
-    { name: 'Cam', value: '#ff9800' },
-    { name: 'Đỏ', value: '#f44336' }
-  ];
+  { name: 'Vàng', value: '#ffc107' },
+  { name: 'Xanh lá', value: '#28a745' },  
+  { name: 'Xanh dương', value: '#007bff' },
+  { name: 'Tím', value: '#6f42c1' },
+  { name: 'Cam', value: '#fd7e14' },
+  { name: 'Đỏ', value: '#dc3545' }
+];
 
   const handleSave = async () => {
     if (!vocabularyData.word.trim() || !vocabularyData.meaning.trim()) {
@@ -48,10 +48,10 @@ export default function VocabularyModal({
     }
   };
 
-  if (!isOpen) return null;
+  // if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] pt-10">
       <div className="bg-white rounded-lg p-6 w-full max-w-lg mx-4">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-gray-800">

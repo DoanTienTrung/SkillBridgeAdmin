@@ -37,7 +37,7 @@ export default function EditLessonModal({ lesson, onClose, onSuccess }) {
       const response = await lessonService.getCategories();
       setCategories(response || []);
     } catch (error) {
-      console.error('Failed to load categories:', error);
+      console.error('Failed to load categories: - EditLessonModal.js:40', error);
     }
   };
 
@@ -72,7 +72,7 @@ export default function EditLessonModal({ lesson, onClose, onSuccess }) {
       onSuccess();
       
     } catch (error) {
-      console.error('Failed to update lesson:', error);
+      console.error('Failed to update lesson: - EditLessonModal.js:75', error);
       setError('Không thể cập nhật bài học. Vui lòng thử lại.');
     } finally {
       setLoading(false);
@@ -80,7 +80,7 @@ export default function EditLessonModal({ lesson, onClose, onSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center flex justify-center items-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-screen overflow-y-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">

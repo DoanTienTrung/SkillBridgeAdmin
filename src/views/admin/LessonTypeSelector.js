@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 
 
 
+
 export default function LessonTypeSelector() {
   const lessonTypes = [
     {
       type: 'listening',
       title: 'Bài Nghe',
       description: 'Tạo bài học luyện nghe với audio và câu hỏi',
-      icon: 'fas fa-headphones',
+      icon: "fas fa-volume-up",
       color: 'bg-blue-500',
       hoverColor: 'hover:bg-blue-600',
       borderColor: 'border-blue-200',

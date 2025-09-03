@@ -9,12 +9,12 @@ class LessonService {
    */
   async createListeningLesson(lessonData) {
     try {
-      console.log('📤 Creating listening lesson:', lessonData);
+      console.log('📤 Creating listening lesson: - lessonService.js:12', lessonData);
       const response = await httpClient.post(API_ENDPOINTS.LISTENING_LESSONS, lessonData);
-      console.log('✅ Listening lesson created successfully:', response);
+      console.log('✅ Listening lesson created successfully: - lessonService.js:14', response);
       return response;
     } catch (error) {
-      console.error('❌ Failed to create listening lesson:', error);
+      console.error('❌ Failed to create listening lesson: - lessonService.js:17', error);
       throw error;
     }
   }
@@ -24,12 +24,12 @@ class LessonService {
    */
   async createReadingLesson(lessonData) {
     try {
-      console.log('📤 Creating reading lesson:', lessonData);
+      console.log('📤 Creating reading lesson: - lessonService.js:27', lessonData);
       const response = await httpClient.post(API_ENDPOINTS.READING_LESSONS, lessonData);
-      console.log('✅ Reading lesson created successfully:', response);
+      console.log('✅ Reading lesson created successfully: - lessonService.js:29', response);
       return response;
     } catch (error) {
-      console.error('❌ Failed to create reading lesson:', error);
+      console.error('❌ Failed to create reading lesson: - lessonService.js:32', error);
       throw error;
     }
   }
@@ -41,12 +41,12 @@ class LessonService {
   async getLessonsAdmin(type) {
     try {
       const endpoint = `/${type}-lessons/admin`;
-      console.log("📤 Fetching lessons for admin from:", endpoint);
+      console.log("📤 Fetching lessons for admin from: - lessonService.js:44", endpoint);
       const response = await httpClient.get(endpoint);
-      console.log('✅ Admin lessons fetched successfully:', response);
+      console.log('✅ Admin lessons fetched successfully: - lessonService.js:46', response);
       return response;
     } catch (error) {
-      console.error('❌ Failed to fetch admin lessons:', error);
+      console.error('❌ Failed to fetch admin lessons: - lessonService.js:49', error);
       throw error;
     }
   }
@@ -65,12 +65,12 @@ class LessonService {
         endpoint = API_ENDPOINTS.LISTENING_LESSON_BY_ID(id);
       }
       
-      console.log(`📤 Fetching ${type} lesson by ID:`, id);
+      console.log(`📤 Fetching ${type} lesson by ID: - lessonService.js:68`, id);
       const response = await httpClient.get(endpoint);
-      console.log('✅ Lesson fetched successfully:', response);
+      console.log('✅ Lesson fetched successfully: - lessonService.js:70', response);
       return response;
     } catch (error) {
-      console.error('❌ Failed to get lesson:', error);
+      console.error('❌ Failed to get lesson: - lessonService.js:73', error);
       throw error;
     }
   }
@@ -90,12 +90,12 @@ class LessonService {
         endpoint = API_ENDPOINTS.LISTENING_LESSON_BY_ID(id);
       }
 
-      console.log(`📤 Updating ${type} lesson:`, id, lessonData);
+      console.log(`📤 Updating ${type} lesson: - lessonService.js:93`, id, lessonData);
       const response = await httpClient.put(endpoint, lessonData);
-      console.log('✅ Lesson updated successfully:', response);
+      console.log('✅ Lesson updated successfully: - lessonService.js:95', response);
       return response;
     } catch (error) {
-      console.error('❌ Failed to update lesson:', error);
+      console.error('❌ Failed to update lesson: - lessonService.js:98', error);
       throw error;
     }
   }
@@ -114,12 +114,12 @@ class LessonService {
         endpoint = API_ENDPOINTS.LISTENING_LESSON_BY_ID(id);
       }
 
-      console.log(`📤 Deleting ${activeTab} lesson:`, id);
+      console.log(`📤 Deleting ${activeTab} lesson: - lessonService.js:117`, id);
       const response = await httpClient.delete(endpoint);
-      console.log(`✅ ${activeTab} lesson deleted successfully:`, response);
+      console.log(`✅ ${activeTab} lesson deleted successfully: - lessonService.js:119`, response);
       return response;
     } catch (error) {
-      console.error('❌ Failed to delete lesson:', error);
+      console.error('❌ Failed to delete lesson: - lessonService.js:122', error);
       throw error;
     }
   }
@@ -139,12 +139,12 @@ class LessonService {
         endpoint = `${API_ENDPOINTS.LISTENING_LESSON_BY_ID(id)}/status?status=${status}`;
       }
 
-      console.log(`📤 Updating ${type} lesson status:`, id, status);
+      console.log(`📤 Updating ${type} lesson status: - lessonService.js:142`, id, status);
       const response = await httpClient.put(endpoint);
-      console.log('✅ Lesson status updated successfully:', response);
+      console.log('✅ Lesson status updated successfully: - lessonService.js:144', response);
       return response;
     } catch (error) {
-      console.error('❌ Failed to update lesson status:', error);
+      console.error('❌ Failed to update lesson status: - lessonService.js:147', error);
       throw error;
     }
   }
@@ -156,9 +156,9 @@ class LessonService {
    */
   async getCategories() {
     try {
-      console.log('📤 Fetching categories...');
+      console.log('📤 Fetching categories... - lessonService.js:159');
       const response = await httpClient.get(API_ENDPOINTS.CATEGORIES);
-      console.log('✅ Categories fetched successfully:', response);
+      console.log('✅ Categories fetched successfully: - lessonService.js:161', response);
 
       // Handle different response formats from backend
       if (response?.data && Array.isArray(response.data)) {
@@ -168,11 +168,11 @@ class LessonService {
       } else if (Array.isArray(response)) {
         return response;
       } else {
-        console.warn('⚠️ Unexpected categories response format:', response);
+        console.warn('⚠️ Unexpected categories response format: - lessonService.js:171', response);
         return [];
       }
     } catch (error) {
-      console.error('❌ Failed to load categories:', error);
+      console.error('❌ Failed to load categories: - lessonService.js:175', error);
       throw error;
     }
   }
@@ -187,7 +187,7 @@ class LessonService {
    */
   async createQuestionsForLesson(lessonId, questions, lessonType) {
     try {
-      console.log(`📝 Creating ${questions.length} questions for lesson ${lessonId}`);
+      console.log(`📝 Creating ${questions.length} questions for lesson ${lessonId} - lessonService.js:190`);
       
       const questionPromises = questions.map(async (question) => {
         const questionCreateDto = {
@@ -208,10 +208,10 @@ class LessonService {
       });
       
       const results = await Promise.all(questionPromises);
-      console.log('✅ All questions created successfully:', results);
+      console.log('✅ All questions created successfully: - lessonService.js:211', results);
       return results;
     } catch (error) {
-      console.error('❌ Failed to create questions:', error);
+      console.error('❌ Failed to create questions: - lessonService.js:214', error);
       throw error;
     }
   }
@@ -224,7 +224,7 @@ class LessonService {
    */
   async addQuestionsToExistingLesson(lessonId, questions, lessonType) {
     try {
-      console.log(`📝 Adding questions to existing lesson ${lessonId}`);
+      console.log(`📝 Adding questions to existing lesson ${lessonId} - lessonService.js:227`);
       
       // Kiểm tra lesson tồn tại
       const lesson = await this.getLessonById(lessonId);
@@ -235,7 +235,7 @@ class LessonService {
       // Tạo câu hỏi
       return await this.createQuestionsForLesson(lessonId, questions, lessonType);
     } catch (error) {
-      console.error('❌ Failed to add questions to lesson:', error);
+      console.error('❌ Failed to add questions to lesson: - lessonService.js:238', error);
       throw error;
     }
   }
@@ -256,12 +256,12 @@ class LessonService {
         endpoint = `${API_ENDPOINTS.LISTENING_LESSON_BY_ID(lessonId)}/preview`;
       }
 
-      console.log(`📤 Loading ${type} lesson preview:`, lessonId);
+      console.log(`📤 Loading ${type} lesson preview: - lessonService.js:259`, lessonId);
       const response = await httpClient.get(endpoint);
-      console.log('✅ Preview data loaded successfully:', response);
+      console.log('✅ Preview data loaded successfully: - lessonService.js:261', response);
       return response;
     } catch (error) {
-      console.error('❌ Failed to load preview:', error);
+      console.error('❌ Failed to load preview: - lessonService.js:264', error);
       throw error;
     }
   }
@@ -280,12 +280,12 @@ class LessonService {
         endpoint = `${API_ENDPOINTS.LISTENING_LESSON_BY_ID(lessonId)}/publish`;
       }
 
-      console.log(`📤 Publishing ${type} lesson:`, lessonId);
+      console.log(`📤 Publishing ${type} lesson: - lessonService.js:283`, lessonId);
       const response = await httpClient.put(endpoint);
-      console.log('✅ Lesson published successfully:', response);
+      console.log('✅ Lesson published successfully: - lessonService.js:285', response);
       return response;
     } catch (error) {
-      console.error('❌ Failed to publish lesson:', error);
+      console.error('❌ Failed to publish lesson: - lessonService.js:288', error);
       throw error;
     }
   }
@@ -297,12 +297,12 @@ class LessonService {
    */
   async getStudentStats() {
     try {
-      console.log('📤 Fetching student stats...');
+      console.log('📤 Fetching student stats... - lessonService.js:300');
       const response = await httpClient.get(API_ENDPOINTS.STUDENT_STATS);
-      console.log('✅ Student stats fetched successfully:', response);
+      console.log('✅ Student stats fetched successfully: - lessonService.js:302', response);
       return response;
     } catch (error) {
-      console.error('❌ Failed to fetch student stats:', error);
+      console.error('❌ Failed to fetch student stats: - lessonService.js:305', error);
       throw error;
     }
   }
@@ -313,12 +313,12 @@ class LessonService {
    */
   async getRecentLessons(limit = 5) {
     try {
-      console.log(`📤 Fetching ${limit} recent lessons...`);
+      console.log(`📤 Fetching ${limit} recent lessons... - lessonService.js:316`);
       const response = await httpClient.get(`${API_ENDPOINTS.STUDENT_RECENT_LESSONS}?limit=${limit}`);
-      console.log('✅ Recent lessons fetched successfully:', response);
+      console.log('✅ Recent lessons fetched successfully: - lessonService.js:318', response);
       return response;
     } catch (error) {
-      console.error('❌ Failed to fetch recent lessons:', error);
+      console.error('❌ Failed to fetch recent lessons: - lessonService.js:321', error);
       throw error;
     }
   }
@@ -336,12 +336,12 @@ class LessonService {
       if (filters.search) params.append('search', filters.search);
       
       const endpoint = `${API_ENDPOINTS.STUDENT_LESSONS}?${params}`;
-      console.log('📤 Fetching published lessons with filters:', filters);
+      console.log('📤 Fetching published lessons with filters: - lessonService.js:339', filters);
       const response = await httpClient.get(endpoint);
-      console.log('✅ Published lessons fetched successfully:', response);
+      console.log('✅ Published lessons fetched successfully: - lessonService.js:341', response);
       return response;
     } catch (error) {
-      console.error('❌ Failed to fetch published lessons:', error);
+      console.error('❌ Failed to fetch published lessons: - lessonService.js:344', error);
       throw error;
     }
   }
@@ -353,12 +353,12 @@ class LessonService {
    */
   async getStudentLessonById(id, type) {
     try {
-      console.log(`📤 Fetching ${type} lesson for student:`, id);
+      console.log(`📤 Fetching ${type} lesson for student: - lessonService.js:356`, id);
       const response = await httpClient.get(API_ENDPOINTS.STUDENT_LESSON_BY_TYPE_ID(type, id));
-      console.log('✅ Student lesson fetched successfully:', response);
+      console.log('✅ Student lesson fetched successfully: - lessonService.js:358', response);
       return response;
     } catch (error) {
-      console.error('❌ Failed to fetch student lesson:', error);
+      console.error('❌ Failed to fetch student lesson: - lessonService.js:361', error);
       throw error;
     }
   }
@@ -370,12 +370,12 @@ class LessonService {
    */
   async getLessonQuestions(lessonId, lessonType) {
     try {
-      console.log(`📤 Fetching questions for lesson ${lessonId}, type: ${lessonType}`);
+      console.log(`📤 Fetching questions for lesson ${lessonId}, type: ${lessonType} - lessonService.js:373`);
       const response = await httpClient.get(`${API_ENDPOINTS.QUESTIONS}/lesson/${lessonId}?lessonType=${lessonType}`);
-      console.log('✅ Lesson questions fetched successfully:', response);
+      console.log('✅ Lesson questions fetched successfully: - lessonService.js:375', response);
       return response;
     } catch (error) {
-      console.error('❌ Failed to fetch lesson questions:', error);
+      console.error('❌ Failed to fetch lesson questions: - lessonService.js:378', error);
       throw error;
     }
   }
@@ -386,12 +386,12 @@ class LessonService {
    */
   async submitAnswers(submissionData) {
     try {
-      console.log('📤 Submitting student answers:', submissionData);
+      console.log('📤 Submitting student answers: - lessonService.js:389', submissionData);
       const response = await httpClient.post(API_ENDPOINTS.STUDENT_SUBMIT_ANSWERS, submissionData);
-      console.log('✅ Answers submitted successfully:', response);
+      console.log('✅ Answers submitted successfully: - lessonService.js:391', response);
       return response;
     } catch (error) {
-      console.error('❌ Failed to submit answers:', error);
+      console.error('❌ Failed to submit answers: - lessonService.js:394', error);
       throw error;
     }
   }
@@ -401,12 +401,12 @@ class LessonService {
    */
   async getStudentProgress() {
     try {
-      console.log('📤 Fetching student progress...');
+      console.log('📤 Fetching student progress... - lessonService.js:404');
       const response = await httpClient.get(API_ENDPOINTS.STUDENT_PROGRESS);
-      console.log('✅ Student progress fetched successfully:', response);
+      console.log('✅ Student progress fetched successfully: - lessonService.js:406', response);
       return response;
     } catch (error) {
-      console.error('❌ Failed to fetch student progress:', error);
+      console.error('❌ Failed to fetch student progress: - lessonService.js:409', error);
       throw error;
     }
   }
@@ -422,12 +422,56 @@ class LessonService {
       const formData = new FormData();
       formData.append('file', file);
       
-      console.log('📤 Uploading text file:', file.name);
+      console.log('📤 Uploading text file: - lessonService.js:425', file.name);
       const response = await httpClient.postMultipart(API_ENDPOINTS.UPLOAD_TEXT_FILE, formData);
-      console.log('✅ Text file uploaded successfully:', response);
+      console.log('✅ Text file uploaded successfully: - lessonService.js:427', response);
       return response;
     } catch (error) {
-      console.error('❌ Failed to upload text file:', error);
+      console.error('❌ Failed to upload text file: - lessonService.js:430', error);
+      throw error;
+    }
+  }
+
+
+/**
+   * Lấy danh sách bài học đã xuất bản cho học viên
+   * @param {Object} filters - Bộ lọc
+   */
+  async getPublishedLessons(filters = {}) {
+    try {
+      const params = new URLSearchParams();
+      
+      // Thêm filters vào query params
+      if (filters.type && filters.type !== 'all') {
+        params.append('type', filters.type.toUpperCase());
+      }
+      if (filters.level && filters.level !== 'all') {
+        params.append('level', filters.level);
+      }
+      if (filters.category && filters.category !== 'all') {
+        params.append('categoryId', filters.category);
+      }
+      if (filters.search && filters.search.trim()) {
+        params.append('search', filters.search.trim());
+      }
+      
+      const endpoint = `${API_ENDPOINTS.STUDENT_LESSONS}${params.toString() ? '?' + params.toString() : ''}`;
+      
+      console.log('📤 Fetching published lessons from: - lessonService.js:460', endpoint);
+      console.log('🎛️ Filters applied: - lessonService.js:461', filters);
+      
+      const response = await httpClient.get(endpoint);
+      
+      console.log('✅ Published lessons API response: - lessonService.js:465', response);
+      
+      return response;
+    } catch (error) {
+      console.error('❌ Failed to fetch published lessons: - lessonService.js:469', error);
+      console.error('Error details: - lessonService.js:470', {
+        message: error.message,
+        status: error.status,
+        endpoint: API_ENDPOINTS.STUDENT_LESSONS
+      });
       throw error;
     }
   }

@@ -24,11 +24,11 @@ export default function LessonManagement() {
       setLoading(true);
       setError('');
       const response = await lessonService.getLessonsAdmin(lessonType);
-      console.log(`✅ ${lessonType} lessons fetched successfully:`, response.data);
+      console.log(`✅ ${lessonType} lessons fetched successfully: - LessonManagement.js:27`, response.data);
       setLessons(response.data || []); // Dữ liệu nằm trong response.data
-      console.log("Lesson in loadLessons below setLessons:", response.data)
+      console.log("Lesson in loadLessons below setLessons: - LessonManagement.js:29", response.data)
     } catch (error) {
-      console.error(`Failed to load ${lessonType} lessons:`, error);
+      console.error(`Failed to load ${lessonType} lessons: - LessonManagement.js:31`, error);
       setError('Không thể tải danh sách bài học. Vui lòng thử lại.');
       setLessons([]);
     } finally {
@@ -46,7 +46,7 @@ export default function LessonManagement() {
   // --- FILTERING LOGIC ---
   // Lọc danh sách bài học dựa trên các bộ lọc
   const filteredLessons = useMemo(() => {
-    console.log("Lession in filter logic: " + lessons)
+    console.log("Lession in filter logic: - LessonManagement.js:49" + lessons)
     return lessons.filter(lesson => {
       const matchesSearch = lesson.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             lesson.description?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -77,7 +77,7 @@ export default function LessonManagement() {
       setLessons(prevLessons => prevLessons.filter(lesson => lesson.id !== lessonId));
       alert('Xóa bài học thành công!');
     } catch (error) {
-      console.error('Failed to delete lesson:', error);
+      console.error('Failed to delete lesson: - LessonManagement.js:80', error);
       alert('Không thể xóa bài học. Vui lòng thử lại.');
     }
   };
@@ -91,7 +91,7 @@ export default function LessonManagement() {
       ));
       alert(`Chuyển trạng thái thành công!`);
     } catch (error) {
-      console.error('Failed to update status:', error);
+      console.error('Failed to update status: - LessonManagement.js:94', error);
       alert('Không thể thay đổi trạng thái. Vui lòng thử lại.');
     }
   };
@@ -115,7 +115,7 @@ export default function LessonManagement() {
 
   const handleQuestionsChange = useCallback(() => {
     // Refresh data if needed
-    console.log('Questions changed, refreshing data...');
+    console.log('Questions changed, refreshing data... - LessonManagement.js:118');
   }, []);
   
   // --- UI HELPER FUNCTIONS ---
@@ -259,9 +259,9 @@ export default function LessonManagement() {
                           <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">{new Date(lesson.createdAt).toLocaleDateString('vi-VN')}</td>
                           <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                             <div className="flex gap-2">
-                              <button onClick={() => handleEdit(lesson)} className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"><i className="fas fa-edit mr-1"></i>Sửa</button>
-                              <button onClick={() => handleStatusChange(lesson.id, lesson.status)} className={`px-2 py-1 rounded text-xs text-white ${lesson.status === 'DRAFT' ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-500 hover:bg-gray-600'}`}><i className={`fas ${lesson.status === 'DRAFT' ? 'fa-eye' : 'fa-eye-slash'} mr-1`}></i>{lesson.status === 'DRAFT' ? 'Xuất bản' : 'Ẩn'}</button>
-                              <button onClick={() => handleDelete(lesson.id, lesson.title)} className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"><i className="fas fa-trash mr-1"></i>Xóa</button>
+                              <button onClick={() => handleEdit(lesson)} className="bg-blue-500 text-black px-2 py-1 rounded text-xs hover:bg-blue-600"><i className="fas fa-edit mr-1"></i>Sửa</button>
+                              <button onClick={() => handleStatusChange(lesson.id, lesson.status)} className={`px-2 py-1 rounded text-xs text-black ${lesson.status === 'DRAFT' ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-500 hover:bg-gray-600'}`}><i className={`fas ${lesson.status === 'DRAFT' ? 'fa-eye' : 'fa-eye-slash'} mr-1`}></i>{lesson.status === 'DRAFT' ? 'Xuất bản' : 'Ẩn'}</button>
+                              <button onClick={() => handleDelete(lesson.id, lesson.title)} className="bg-red-500 text-black px-2 py-1 rounded text-xs hover:bg-red-600"><i className="fas fa-trash mr-1"></i>Xóa</button>
                             </div>
                           </td>
                         </tr>

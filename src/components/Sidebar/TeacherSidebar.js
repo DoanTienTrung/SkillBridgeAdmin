@@ -179,7 +179,10 @@ export default function TeacherSidebar() {
 
             {/* Divider */}
             <hr className="my-4 md:min-w-full" />
-
+            <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
+              Chức năng
+            </h6>
+             <ul className="md:flex-col md:min-w-full flex flex-col list-none">
             {/* Content Management */}
             <li className="items-center">
               <Link
@@ -202,11 +205,6 @@ export default function TeacherSidebar() {
                 Tạo bài học
               </Link>
             </li>
-
-            <ul className="md:flex-col md:min-w-full flex flex-col list-none">
-              
-
-
 
               <li className="items-center">
                 <Link
@@ -305,52 +303,23 @@ export default function TeacherSidebar() {
                       Cài đặt
                     </Link>
                   </li>
+
+                  <li className="items-center">
+                    <button
+                      className="w-full text-left text-red-500 hover:text-red-600 text-xs uppercase py-3 font-bold block"
+                      onClick={() => {
+                        if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                          authService.logout();
+                        }
+                      }}
+                    >
+                      <i className="fas fa-sign-out-alt text-red-400 mr-2 text-sm"></i>{" "}
+                      Đăng xuất
+                    </button>
+                  </li>
                 </ul>
               </>
             )}
-
-            {/* Divider */}
-            <hr className="my-4 md:min-w-full" />
-
-            {/* Quick Actions */}
-            <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
-              Thao tác nhanh
-            </h6>
-
-            <ul className="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
-              <Link to="/teacher/create-lesson">
-                <i className="fas fa-plus text-blueGray-400 mr-2 text-sm"></i>
-                Tạo bài học
-              </Link>
-
-              <li className="items-center">
-                <button
-                  className="w-full text-left text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
-                  onClick={() => {
-                    // TODO: Implement backup functionality
-                    alert('Tính năng sao lưu dữ liệu sẽ được phát triển');
-                  }}
-                >
-                  <i className="fas fa-download text-blueGray-400 mr-2 text-sm"></i>{" "}
-                  Sao lưu dữ liệu
-                </button>
-              </li>
-
-              <li className="items-center">
-                <button
-                  className="w-full text-left text-red-500 hover:text-red-600 text-xs uppercase py-3 font-bold block"
-                  onClick={() => {
-                    if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                      authService.logout();
-                    }
-                  }}
-                >
-                  <i className="fas fa-sign-out-alt text-red-400 mr-2 text-sm"></i>{" "}
-                  Đăng xuất
-                </button>
-              </li>
-            </ul>
-
             {/* Version Info */}
             <div className="mt-auto pt-4 border-t border-blueGray-200">
               <div className="text-center">

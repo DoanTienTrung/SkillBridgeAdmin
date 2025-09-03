@@ -37,55 +37,36 @@ export default function LessonList() {
 
   const fetchLessons = async () => {
     setLoading(true);
+    setError(null);
+    
     try {
-      const params = {
-        page: pagination.page - 1, // Backend dùng 0-based indexing
-        size: pagination.limit,
-        ...(filters.level !== 'all' && { level: filters.level }),
-        ...(filters.type !== 'all' && { type: filters.type }),
-        ...(filters.category !== 'all' && { categoryId: filters.category }),
-        ...(filters.search && { search: filters.search })
-      };
-
-      // Gọi API để lấy tất cả lessons đã publish
-      const response = await lessonService.getPublishedLessons({
-        type: filters.type,
-        level: filters.level,
-        category: filters.category,
-        search: filters.search
-      });
-
-      let allLessons = response.data || [];
-
-      // Filter by type if specified
-      if (filters.type !== 'all') {
-        allLessons = allLessons.filter(lesson => lesson.type === filters.type);
+      console.log('🔍 Fetching lessons with filters: - LessonList.js:43', filters);
+      
+      // Gọi API đúng endpoint - /users/student/lessons
+      const response = await lessonService.getPublishedLessons(filters);
+      
+      console.log('📡 API Response: - LessonList.js:48', response);
+      
+      if (response && response.success) {
+        const allLessons = response.data || [];
+        console.log(`✅ Loaded ${allLessons.length} lessons successfully - LessonList.js:52`);
+        
+        setLessons(allLessons);
+        setPagination(prev => ({
+          ...prev,
+          total: allLessons.length,
+          totalPages: Math.ceil(allLessons.length / prev.limit)
+        }));
+      } else {
+        console.warn('⚠️ API Response not successful: - LessonList.js:61', response);
+        setLessons([]);
+        setError('Không có bài học nào được tìm thấy.');
       }
-
-      // Filter by level if specified
-      if (filters.level !== 'all') {
-        allLessons = allLessons.filter(lesson => lesson.level === filters.level);
-      }
-
-      // Search filter
-      if (filters.search) {
-        const searchTerm = filters.search.toLowerCase();
-        allLessons = allLessons.filter(lesson => 
-          lesson.title.toLowerCase().includes(searchTerm) ||
-          lesson.description.toLowerCase().includes(searchTerm)
-        );
-      }
-
-      setLessons(allLessons);
-      setPagination(prev => ({
-        ...prev,
-        total: allLessons.length,
-        totalPages: Math.ceil(allLessons.length / pagination.limit)
-      }));
 
     } catch (error) {
-      console.error('Error fetching lessons:', error);
-      setError('Không thể tải danh sách bài học. Vui lòng thử lại.');
+      console.error('❌ Error fetching lessons: - LessonList.js:67', error);
+      setError('Không thể tải danh sách bài học. Vui lòng kiểm tra kết nối và thử lại.');
+      setLessons([]);
     } finally {
       setLoading(false);
     }
@@ -93,14 +74,19 @@ export default function LessonList() {
 
   const fetchCategories = async () => {
     try {
+      console.log('📂 Fetching categories... - LessonList.js:77');
       const categories = await lessonService.getCategories();
+      console.log('✅ Categories loaded: - LessonList.js:79', categories);
       setCategories(categories || []);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error('❌ Error fetching categories: - LessonList.js:82', error);
+      // Don't show error for categories, just use empty array
+      setCategories([]);
     }
   };
 
   const handleFilterChange = (filterType, value) => {
+    console.log(`🎛️ Filter changed: ${filterType} = ${value} - LessonList.js:89`);
     setFilters(prev => ({
       ...prev,
       [filterType]: value
@@ -110,6 +96,7 @@ export default function LessonList() {
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
+    console.log('🔍 Search changed: - LessonList.js:99', value);
     setFilters(prev => ({ ...prev, search: value }));
     setPagination(prev => ({ ...prev, page: 1 }));
   };
@@ -117,6 +104,16 @@ export default function LessonList() {
   const handlePageChange = (newPage) => {
     setPagination(prev => ({ ...prev, page: newPage }));
     window.scrollTo(0, 0); // Scroll to top
+  };
+
+  const handleRetry = () => {
+    console.log('🔄 Retrying to fetch lessons... - LessonList.js:110');
+    fetchLessons();
+  };
+
+  const handleClearFilters = () => {
+    console.log('🧹 Clearing all filters... - LessonList.js:115');
+    setFilters({ level: 'all', type: 'all', category: 'all', search: '' });
   };
 
   // Paginate lessons for current page
@@ -128,14 +125,38 @@ export default function LessonList() {
   if (error) {
     return (
       <div className="flex-1 bg-blueGray-50 p-4">
-        <div className="text-center py-12">
-          <div className="text-red-500 text-lg">{error}</div>
-          <button 
-            onClick={() => window.location.reload()}
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-          >
-            Thử lại
-          </button>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center py-12 bg-white rounded-lg shadow-sm">
+            <div className="mb-4">
+              <i className="fas fa-exclamation-triangle text-red-500 text-4xl mb-4"></i>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Có lỗi xảy ra</h2>
+              <p className="text-red-500 text-lg mb-4">{error}</p>
+            </div>
+            <div className="space-x-4">
+              <button 
+                onClick={handleRetry}
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <i className="fas fa-redo mr-2"></i>
+                Thử lại
+              </button>
+              <button 
+                onClick={handleClearFilters}
+                className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                <i className="fas fa-eraser mr-2"></i>
+                Xóa bộ lọc
+              </button>
+            </div>
+            <div className="mt-6 text-sm text-gray-500">
+              <p>💡 <strong>Gợi ý khắc phục:</strong></p>
+              <ul className="mt-2 list-disc list-inside text-left max-w-md mx-auto">
+                <li>Kiểm tra kết nối internet</li>
+                <li>Đăng nhập lại tài khoản</li>
+                <li>Liên hệ admin nếu lỗi vẫn tiếp diễn</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -165,6 +186,14 @@ export default function LessonList() {
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <i className="fas fa-search text-gray-400"></i>
               </div>
+              {filters.search && (
+                <button
+                  onClick={() => handleFilterChange('search', '')}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  <i className="fas fa-times text-gray-400 hover:text-gray-600"></i>
+                </button>
+              )}
             </div>
           </div>
 
@@ -195,8 +224,8 @@ export default function LessonList() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">Tất cả loại</option>
-                <option value="LISTENING">Nghe</option>
-                <option value="READING">Đọc</option>
+                <option value="reading">Đọc</option>
+                <option value="listening">Nghe</option>
               </select>
             </div>
 
@@ -217,33 +246,86 @@ export default function LessonList() {
               </select>
             </div>
           </div>
+
+          {/* Active Filters Display */}
+          {(filters.level !== 'all' || filters.type !== 'all' || filters.category !== 'all' || filters.search) && (
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">Bộ lọc đang áp dụng:</span>
+              
+              {filters.level !== 'all' && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                  Cấp độ: {filters.level}
+                  <button onClick={() => handleFilterChange('level', 'all')} className="ml-2 text-blue-600">
+                    <i className="fas fa-times"></i>
+                  </button>
+                </span>
+              )}
+              
+              {filters.type !== 'all' && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
+                  Loại: {filters.type === 'reading' ? 'Đọc' : 'Nghe'}
+                  <button onClick={() => handleFilterChange('type', 'all')} className="ml-2 text-green-600">
+                    <i className="fas fa-times"></i>
+                  </button>
+                </span>
+              )}
+              
+              {filters.search && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
+                  Tìm kiếm: "{filters.search}"
+                  <button onClick={() => handleFilterChange('search', '')} className="ml-2 text-purple-600">
+                    <i className="fas fa-times"></i>
+                  </button>
+                </span>
+              )}
+              
+              <button
+                onClick={handleClearFilters}
+                className="text-sm text-gray-500 hover:text-gray-700 underline"
+              >
+                Xóa tất cả
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Results Summary */}
         <div className="flex justify-between items-center mb-6">
           <div className="text-gray-600">
-            Tìm thấy {lessons.length} bài học
+            {loading ? (
+              <span>Đang tải...</span>
+            ) : (
+              <span>Tìm thấy <strong>{lessons.length}</strong> bài học</span>
+            )}
           </div>
-          <div className="text-gray-600">
-            Trang {pagination.page} / {pagination.totalPages}
-          </div>
+          {pagination.totalPages > 1 && (
+            <div className="text-gray-600">
+              Trang {pagination.page} / {pagination.totalPages}
+            </div>
+          )}
         </div>
 
         {/* Loading State */}
         {loading && (
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            <span className="ml-3 text-gray-600">Đang tải bài học...</span>
           </div>
         )}
 
         {/* No Results */}
-        {!loading && lessons.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-500 text-lg mb-4">Không tìm thấy bài học nào</div>
+        {!loading && lessons.length === 0 && !error && (
+          <div className="text-center py-12 bg-white rounded-lg shadow-sm">
+            <div className="mb-4">
+              <i className="fas fa-search text-gray-400 text-4xl mb-4"></i>
+              <div className="text-gray-500 text-lg mb-4">Không tìm thấy bài học nào</div>
+              <p className="text-gray-400 mb-6">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+            </div>
             <button
-              onClick={() => setFilters({ level: 'all', type: 'all', category: 'all', search: '' })}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+              onClick={handleClearFilters}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
             >
+              <i className="fas fa-eraser mr-2"></i>
               Xóa bộ lọc
             </button>
           </div>
@@ -253,7 +335,10 @@ export default function LessonList() {
         {!loading && paginatedLessons.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
             {paginatedLessons.map(lesson => (
-              <LessonCard key={`${lesson.type}-${lesson.id}`} lesson={lesson} />
+              <LessonCard 
+                key={`${lesson.type || 'unknown'}-${lesson.id}`} 
+                lesson={lesson} 
+              />
             ))}
           </div>
         )}

@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-export default function TextHighlighter({ 
-  text, 
-  vocabularies = [], 
-  onTextSelect, 
+export default function TextHighlighter({
+  text,
+  vocabularies = [],
+  onTextSelect,
   onWordClick,
   readOnly = false,
   fontSize = 16,
@@ -26,7 +26,7 @@ export default function TextHighlighter({
 
     // Calculate positions relative to the text container
     const textElement = textRef.current;
-    
+
     const startOffset = getTextOffset(textElement, range.startContainer, range.startOffset);
     const endOffset = getTextOffset(textElement, range.endContainer, range.endOffset);
 
@@ -41,11 +41,11 @@ export default function TextHighlighter({
     // Clear selection
     selection.removeAllRanges();
   };
-  
+
   // Handle word click for dictionary lookup
   const handleWordClick = (e, word) => {
     if (!onWordClick) return;
-    
+
     e.stopPropagation();
     onWordClick(word.trim());
   };
@@ -76,7 +76,7 @@ export default function TextHighlighter({
 
     // Sort vocabularies by start position
     const sortedVocabs = [...vocabularies].sort((a, b) => a.startPosition - b.startPosition);
-    
+
     let result = [];
     let lastIndex = 0;
 
@@ -95,16 +95,21 @@ export default function TextHighlighter({
         <span
           key={`vocab-${vocab.id}`}
           className="vocabulary-highlight cursor-pointer relative group"
-          style={{ 
+          style={{
             backgroundColor: vocab.highlightColor,
+            color: '#000000', // Text đen cho tất cả
             padding: '2px 4px',
             borderRadius: '3px',
-            fontWeight: '500'
+            fontWeight: 'bold',
+            border: '1px solid rgba(0,0,0,0.2)', // Border nhẹ
+            marginLeft: '1px',
+            marginRight: '1px'
           }}
           title={`${vocab.word}: ${vocab.meaning}`}
         >
           {text.substring(vocab.startPosition, vocab.endPosition)}
-          
+
+
           {/* Tooltip */}
           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
             <div className="bg-gray-800 text-white text-sm rounded-lg p-3 min-w-64 max-w-xs">

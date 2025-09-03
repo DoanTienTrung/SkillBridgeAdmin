@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-// import authService from 'services/authService';
+import authService from 'services/authService';
 
 export default function AvatarUpload({ user, onAvatarUpdate, className = '' }) {
   const [avatarFile, setAvatarFile] = useState(null);
@@ -45,10 +45,10 @@ export default function AvatarUpload({ user, onAvatarUpdate, className = '' }) {
       setIsUploading(true);
       setUploadProgress(0);
 
-      // const updatedUser = await authService.uploadAvatar(
-      //   avatarFile,
-      //   (progress) => setUploadProgress(progress)
-      // );
+      const updatedUser = await authService.uploadAvatar(
+        avatarFile,
+        (progress) => setUploadProgress(progress)
+      );
 
       // Notify parent component
       // if (onAvatarUpdate) {

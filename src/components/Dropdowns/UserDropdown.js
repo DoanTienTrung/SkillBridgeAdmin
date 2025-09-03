@@ -1,87 +1,75 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { createPopper } from "@popperjs/core";
 
-const UserDropdown = () => {
-  // dropdown props
-  const [dropdownPopoverShow, setDropdownPopoverShow] = React.useState(false);
-  const btnDropdownRef = React.createRef();
-  const popoverDropdownRef = React.createRef();
-  const openDropdownPopover = () => {
-    createPopper(btnDropdownRef.current, popoverDropdownRef.current, {
-      placement: "bottom-start",
-    });
-    setDropdownPopoverShow(true);
+const UserDropdown = ({ avatarUrl }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const btnRef = useRef(null);
+  const popoverRef = useRef(null);
+
+  const toggleDropdown = () => {
+    if (isOpen) {
+      setIsOpen(false);
+    } else {
+      createPopper(btnRef.current, popoverRef.current, {
+        placement: "bottom-start",
+      });
+      setIsOpen(true);
+    }
   };
-  const closeDropdownPopover = () => {
-    setDropdownPopoverShow(false);
-  };
+
   return (
-    <>
-      <a
-        className="text-blueGray-500 block"
-        href="#pablo"
-        ref={btnDropdownRef}
-        onClick={(e) => {
-          e.preventDefault();
-          dropdownPopoverShow ? closeDropdownPopover() : openDropdownPopover();
-        }}
+    <div className="relative inline-block">
+      {/* Nút avatar */}
+      <button
+        ref={btnRef}
+        onClick={toggleDropdown}
+        className="focus:outline-none"
       >
-        <div className="items-center flex">
-          <span className="w-12 h-12 text-sm text-white bg-blueGray-200 inline-flex items-center justify-center rounded-full">
+        <div className="flex items-center">
+          <span className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
             <img
-              alt="..."
-              className="w-full rounded-full align-middle border-none shadow-lg"
-              src={require("assets/img/team-1-800x800.jpg")}
+              alt="avatar"
+              className="w-full h-full object-cover border-none shadow-lg"
+              src={avatarUrl || require("assets/img/team-1-800x800.jpg")}
             />
           </span>
         </div>
-      </a>
+      </button>
+
+      {/* Menu dropdown */}
       <div
-        ref={popoverDropdownRef}
-        className={
-          (dropdownPopoverShow ? "block " : "hidden ") +
-          "bg-white text-base z-50 float-left py-2 list-none text-left rounded shadow-lg min-w-48"
-        }
+        ref={popoverRef}
+        className={`${
+          isOpen ? "block" : "hidden"
+        } bg-white text-sm z-50 mt-2 py-2 list-none text-left rounded shadow-lg min-w-[12rem]`}
       >
-        <a
-          href="#pablo"
-          className={
-            "text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
-          }
-          onClick={(e) => e.preventDefault()}
+        <button
+          className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+          onClick={() => alert("Action")}
         >
           Action
-        </a>
-        <a
-          href="#pablo"
-          className={
-            "text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
-          }
-          onClick={(e) => e.preventDefault()}
+        </button>
+        <button
+          className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+          onClick={() => alert("Another action")}
         >
           Another action
-        </a>
-        <a
-          href="#pablo"
-          className={
-            "text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
-          }
-          onClick={(e) => e.preventDefault()}
+        </button>
+        <button
+          className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+          onClick={() => alert("Something else here")}
         >
           Something else here
-        </a>
-        <div className="h-0 my-2 border border-solid border-blueGray-100" />
-        <a
-          href="#pablo"
-          className={
-            "text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"
-          }
-          onClick={(e) => e.preventDefault()}
+        </button>
+        <div className="h-px my-2 bg-gray-200" />
+        <button
+          className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+          onClick={() => alert("Separated link")}
         >
-          Seprated link
-        </a>
+          Separated link
+        </button>
       </div>
-    </>
+    </div>
   );
 };
 

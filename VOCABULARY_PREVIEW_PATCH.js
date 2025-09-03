@@ -27,9 +27,9 @@ const handleSaveVocabulary = async (vocabularyData) => {
   try {
     const response = await vocabularyService.addVocabularyToLesson(currentLessonId, vocabularyData);
     setVocabularies(prev => [...prev, response.data]);
-    console.log('✅ Vocabulary added successfully');
+    console.log('✅ Vocabulary added successfully - VOCABULARY_PREVIEW_PATCH.js:30');
   } catch (error) {
-    console.error('❌ Failed to add vocabulary:', error);
+    console.error('❌ Failed to add vocabulary: - VOCABULARY_PREVIEW_PATCH.js:32', error);
     throw error;
   }
 };
@@ -40,9 +40,9 @@ const handleDeleteVocabulary = async (vocabularyId) => {
   try {
     await vocabularyService.removeVocabularyFromLesson(currentLessonId, vocabularyId);
     setVocabularies(prev => prev.filter(v => v.id !== vocabularyId));
-    console.log('✅ Vocabulary deleted successfully');
+    console.log('✅ Vocabulary deleted successfully - VOCABULARY_PREVIEW_PATCH.js:43');
   } catch (error) {
-    console.error('❌ Failed to delete vocabulary:', error);
+    console.error('❌ Failed to delete vocabulary: - VOCABULARY_PREVIEW_PATCH.js:45', error);
     alert('Lỗi khi xóa từ vựng: ' + error.message);
   }
 };
@@ -59,7 +59,7 @@ const handlePreview = async () => {
     const response = await lessonService.getPreviewData(currentLessonId);
     setPreviewData(response.data);
   } catch (error) {
-    console.error('❌ Failed to load preview:', error);
+    console.error('❌ Failed to load preview: - VOCABULARY_PREVIEW_PATCH.js:62', error);
     alert('Lỗi khi tải preview: ' + error.message);
     setPreviewModal(false);
   }
@@ -77,7 +77,7 @@ const handlePublish = async () => {
     const response = await lessonService.getPreviewData(currentLessonId);
     setPreviewData(response.data);
   } catch (error) {
-    console.error('❌ Failed to publish lesson:', error);
+    console.error('❌ Failed to publish lesson: - VOCABULARY_PREVIEW_PATCH.js:80', error);
     alert('Lỗi khi xuất bản bài học: ' + error.message);
   }
 };
@@ -97,7 +97,7 @@ if (response.data.id) {
     const vocabResponse = await vocabularyService.getLessonVocabularies(response.data.id);
     setVocabularies(vocabResponse.data || []);
   } catch (error) {
-    console.log('No vocabularies found for this lesson');
+    console.log('No vocabularies found for this lesson - VOCABULARY_PREVIEW_PATCH.js:100');
   }
 }
 
@@ -221,7 +221,7 @@ if (response.data.id) {
 
 {/* Preview Modal */}
 {previewModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div className="inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
     <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
       <LessonPreview
         previewData={previewData}

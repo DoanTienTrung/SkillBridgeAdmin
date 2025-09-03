@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import lessonService from '../../services/lessonService';
+import userService from '../../services/userService'; // Cần tạo userService nếu chưa có
 
 export default function ProgressTracker() {
   const [stats, setStats] = useState({
@@ -9,7 +11,9 @@ export default function ProgressTracker() {
     vocabularyCount: 0,
     currentStreak: 0
   });
+  const [progressData, setProgressData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchProgressData();
@@ -18,21 +22,46 @@ export default function ProgressTracker() {
   const fetchProgressData = async () => {
     try {
       setLoading(true);
-      // TODO: Implement progress API call
-      // const response = await progressService.getUserProgress();
-      // setStats(response.data);
+      setError(null);
       
-      // Temporary mock data
-      setStats({
-        totalLessons: 50,
-        completedLessons: 23,
-        totalTimeStudied: 1247, // minutes
-        averageScore: 87,
-        vocabularyCount: 156,
-        currentStreak: 7
-      });
+      // Gọi API thực thay vì mock data
+      const progressResponse = await lessonService.getStudentProgress();
+      
+      if (progressResponse.success && progressResponse.data) {
+        const data = progressResponse.data;
+        
+        // Map dữ liệu từ API response
+        setStats({
+          totalLessons: data.overview?.totalLessons || 0,
+          completedLessons: data.overview?.completedLessons || 0,
+          totalTimeStudied: data.overview?.totalTimeStudied || 0,
+          averageScore: data.overview?.averageScore || 0,
+          vocabularyCount: data.overview?.vocabularyCount || 0,
+          currentStreak: data.overview?.currentStreak || 0
+        });
+        
+        setProgressData(data);
+      } else {
+        // Fallback to stats API nếu progress API không hoạt động
+        const statsResponse = await userService.getStudentStats();
+        if (statsResponse.success && statsResponse.data) {
+          setStats(statsResponse.data);
+        }
+      }
+      
     } catch (error) {
-      console.error('Error fetching progress:', error);
+      console.error('Error fetching progress: - ProgressTracker.js:53', error);
+      setError('Không thể tải dữ liệu tiến độ. Vui lòng thử lại.');
+      
+      // Fallback to mock data nếu API fail
+      setStats({
+        totalLessons: 0,
+        completedLessons: 0,
+        totalTimeStudied: 0,
+        averageScore: 0,
+        vocabularyCount: 0,
+        currentStreak: 0
+      });
     } finally {
       setLoading(false);
     }
@@ -49,6 +78,24 @@ export default function ProgressTracker() {
       <div className="flex-1 bg-blueGray-50 p-4">
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex-1 bg-blueGray-50 p-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center py-12">
+            <div className="text-red-500 text-lg mb-4">{error}</div>
+            <button 
+              onClick={fetchProgressData}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            >
+              Thử lại
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -76,15 +123,19 @@ export default function ProgressTracker() {
             <div className="text-3xl font-bold text-gray-900 mb-2">
               {stats.completedLessons}/{stats.totalLessons}
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-              <div 
-                className="bg-blue-600 h-2 rounded-full" 
-                style={{ width: `${(stats.completedLessons / stats.totalLessons) * 100}%` }}
-              ></div>
-            </div>
-            <div className="text-sm text-gray-600">
-              {Math.round((stats.completedLessons / stats.totalLessons) * 100)}% hoàn thành
-            </div>
+            {stats.totalLessons > 0 && (
+              <>
+                <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full" 
+                    style={{ width: `${(stats.completedLessons / stats.totalLessons) * 100}%` }}
+                  ></div>
+                </div>
+                <div className="text-sm text-gray-600">
+                  {Math.round((stats.completedLessons / stats.totalLessons) * 100)}% hoàn thành
+                </div>
+              </>
+            )}
           </div>
 
           {/* Study Time */}
@@ -150,6 +201,11 @@ export default function ProgressTracker() {
               <div className="text-center">
                 <i className="fas fa-chart-line text-4xl mb-4"></i>
                 <p>Biểu đồ tiến độ sẽ được hiển thị ở đây</p>
+                {progressData?.charts?.weeklyProgress && (
+                  <small className="text-xs text-gray-400">
+                    (Dữ liệu từ API: {progressData.charts.weeklyProgress.length} điểm dữ liệu)
+                  </small>
+                )}
               </div>
             </div>
           </div>
@@ -158,22 +214,24 @@ export default function ProgressTracker() {
           <div className="bg-white p-6 rounded-lg shadow-sm">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Hoạt động gần đây</h3>
             <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-sm">Hoàn thành bài "Daily Conversation" - 92%</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span className="text-sm">Thêm 5 từ vựng mới</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                <span className="text-sm">Học bài "Business English" - 88%</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                <span className="text-sm">Ôn tập từ vựng - 15 từ</span>
-              </div>
+              {progressData?.recentActivities && progressData.recentActivities.length > 0 ? (
+                progressData.recentActivities.slice(0, 5).map((activity, index) => (
+                  <div key={index} className="flex items-center space-x-3">
+                    <div className={`w-2 h-2 rounded-full ${
+                      activity.isCompleted ? 'bg-green-500' : 'bg-blue-500'
+                    }`}></div>
+                    <span className="text-sm">
+                      {activity.isCompleted ? 'Hoàn thành' : 'Đang học'} bài "{activity.lessonTitle}" 
+                      {activity.score && ` - ${Math.round(activity.score)}%`}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-4">
+                  <p>Chưa có hoạt động gần đây</p>
+                  <p className="text-sm">Bắt đầu học bài đầu tiên của bạn!</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -184,20 +242,26 @@ export default function ProgressTracker() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium">Hoàn thành 30 bài học trong tháng</span>
-                <span className="text-sm text-gray-600">23/30</span>
+                <span className="text-sm font-medium">Hoàn thành bài học trong tháng</span>
+                <span className="text-sm text-gray-600">{stats.completedLessons}/30</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-blue-600 h-2 rounded-full" style={{ width: '77%' }}></div>
+                <div 
+                  className="bg-blue-600 h-2 rounded-full" 
+                  style={{ width: `${Math.min((stats.completedLessons / 30) * 100, 100)}%` }}
+                ></div>
               </div>
             </div>
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium">Học 20 giờ trong tháng</span>
-                <span className="text-sm text-gray-600">20h 47m/20h</span>
+                <span className="text-sm font-medium">Học trong tháng</span>
+                <span className="text-sm text-gray-600">{formatTime(stats.totalTimeStudied)}/20h</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-green-600 h-2 rounded-full" style={{ width: '100%' }}></div>
+                <div 
+                  className="bg-green-600 h-2 rounded-full" 
+                  style={{ width: `${Math.min((stats.totalTimeStudied / 1200) * 100, 100)}%` }}
+                ></div>
               </div>
             </div>
           </div>

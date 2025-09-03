@@ -1,44 +1,15 @@
-import { Link } from 'react-router-dom';
+
 import React, { useState, useEffect } from "react";
 import authService from "../../services/authService";
 
-// components
-import CardStats from "components/Cards/CardStats.js";
-import CardLineChart from "components/Cards/CardLineChart.js";
-import CardBarChart from "components/Cards/CardBarChart.js";
-import CardPageVisits from "components/Cards/CardPageVisits.js";
-import CardSocialTraffic from "components/Cards/CardSocialTraffic.js";
+// // components
+// import CardStats from "components/Cards/CardStats.js";
+// import CardLineChart from "components/Cards/CardLineChart.js";
+// import CardBarChart from "components/Cards/CardBarChart.js";
+// import CardPageVisits from "components/Cards/CardPageVisits.js";
+// import CardSocialTraffic from "components/Cards/CardSocialTraffic.js";
 
-const quickActions = [
-  {
-    title: 'Tạo bài học mới',
-    description: 'Tạo bài nghe hoặc bài đọc',
-    icon: 'fas fa-plus-circle',
-    color: 'bg-lightBlue-500',
-    route: '/teacher/create-lesson'
-  },
-  {
-    title: 'Quản lý bài học',
-    description: 'Xem và chỉnh sửa bài học',
-    icon: 'fas fa-book-open',
-    color: 'bg-purple-500',
-    route: '/teacher/lessons'
-  },
-  {
-    title: 'Xem báo cáo',
-    description: 'Thống kê và phân tích',
-    icon: 'fas fa-chart-line',
-    color: 'bg-orange-500',
-    route: '/teacher/reports'
-  },
-  {
-    title: 'Cài đặt hệ thống',
-    description: 'Cài đặt hệ thống',
-    icon: 'fas fa-cog',
-    color: 'bg-orange-500',
-    route: '/teacher/system'
-  }
-];
+
 
 export default function TeacherDashboard() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -64,7 +35,7 @@ export default function TeacherDashboard() {
       const stats = await authService.getDashboardStats();
       setDashboardStats(stats);
     } catch (error) {
-      console.error('Error loading dashboard stats:', error);
+      console.error('Error loading dashboard stats: - TeacherDashboard.js:38', error);
       // Keep mock data as fallback
       setDashboardStats({
         totalLessons: 25,
@@ -136,7 +107,7 @@ export default function TeacherDashboard() {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards
       <div className="relative -mt-24">
         <div className="px-4 md:px-10 mx-auto w-full">
           <div className="flex flex-wrap">
@@ -193,7 +164,7 @@ export default function TeacherDashboard() {
       </div>
 
       {/* Charts */}
-      <div className="px-4 md:px-10 mx-auto w-full">
+      {/* <div className="px-4 md:px-10 mx-auto w-full">
         <div className="flex flex-wrap mt-4">
           <div className="w-full xl:w-8/12 mb-12 xl:mb-0 px-4">
             <CardLineChart />
@@ -210,79 +181,9 @@ export default function TeacherDashboard() {
             <CardSocialTraffic />
           </div>
         </div>
-      </div>
+      </div> */}
 
-      {/* Quick Actions */}
-      <div className="px-4 md:px-10 mx-auto w-full mt-8">
-        <div className="flex flex-wrap">
-          <div className="w-full lg:w-12/12 px-4">
-            <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white">
-              <div className="rounded-t mb-0 px-4 py-3 border-0">
-                <div className="flex flex-wrap items-center">
-                  <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-                    <h3 className="font-semibold text-lg text-blueGray-700">
-                      Thao tác nhanh
-                    </h3>
-                    <p className="text-sm text-blueGray-500">
-                      Các tính năng thường sử dụng
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="block w-full overflow-x-auto">
-                <div className="px-4 py-3">
-                  <div className="flex flex-wrap">
-                    {/* <div className="w-full sm:w-6/12 lg:w-3/12 px-2 mb-4">
-                      <button className="w-full bg-lightBlue-500 text-white px-4 py-3 rounded-lg hover:bg-lightBlue-600 transition-colors flex items-center justify-center">
-                        <i className="fas fa-plus mr-2"></i>
-                        Tạo bài học mới
-                      </button>
-                    </div> */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                      {quickActions.map((action, index) => (
-                        <Link
-                          key={index}
-                          to={action.route}
-                          className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-300 m-2"
-                        >
-                          <div className="flex items-center">
-                            <div className={`w-12 h-12 ${action.color} rounded-lg flex items-center justify-center mr-4`}>
-                              <i className={`${action.icon} text-white text-xl`}></i>
-                            </div>
-                            <div>
-                              <h4 className="font-semibold text-blueGray-700">{action.title}</h4>
-                              <p className="text-sm text-blueGray-600">{action.description}</p>
-                            </div>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-
-                    {/* <div className="w-full sm:w-6/12 lg:w-3/12 px-2 mb-4">
-                      <button className="w-full bg-emerald-500 text-white px-4 py-3 rounded-lg hover:bg-emerald-600 transition-colors flex items-center justify-center">
-                        <i className="fas fa-users mr-2"></i>
-                        Quản lý học viên
-                      </button>
-                    </div> */}
-                    {/* <div className="w-full sm:w-6/12 lg:w-3/12 px-2 mb-4">
-                      <button className="w-full bg-orange-500 text-white px-4 py-3 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center">
-                        <i className="fas fa-chart-bar mr-2"></i>
-                        Báo cáo chi tiết
-                      </button>
-                    </div> */}
-                    {/* <div className="w-full sm:w-6/12 lg:w-3/12 px-2 mb-4">
-                      <button className="w-full bg-pink-500 text-white px-4 py-3 rounded-lg hover:bg-pink-600 transition-colors flex items-center justify-center">
-                        <i className="fas fa-cog mr-2"></i>
-                        Cài đặt hệ thống
-                      </button>
-                    </div> */}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      
     </>
   );
 }
