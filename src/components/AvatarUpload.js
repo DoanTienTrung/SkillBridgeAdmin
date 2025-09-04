@@ -50,10 +50,10 @@ export default function AvatarUpload({ user, onAvatarUpdate, className = '' }) {
         (progress) => setUploadProgress(progress)
       );
 
-      // Notify parent component
-      // if (onAvatarUpdate) {
-      //   onAvatarUpdate(updatedUser);
-      // }
+     // Notify parent component
+      if (onAvatarUpdate) {
+        onAvatarUpdate(updatedUser);
+      }
       
       setAvatarFile(null);
       setAvatarPreview(null);
@@ -69,10 +69,15 @@ export default function AvatarUpload({ user, onAvatarUpdate, className = '' }) {
   };
 
   const getAvatarUrl = () => {
-    if (avatarPreview) return avatarPreview;
-    if (user?.avatarUrl) return `/api/upload/images/${user.avatarUrl.split('/').pop()}`;
-    return '/img/default-avatar.png';
-  };
+  if (avatarPreview) return avatarPreview;
+  if (user?.avatarUrl) {
+    // Handle both full URL and relative path
+    return user.avatarUrl.startsWith('http') 
+      ? user.avatarUrl 
+      : `http://localhost:8080/api/upload/images/${user.avatarUrl.split('/').pop()}`;
+  }
+  return '/img/team-2-800x800.jpg';
+};
 
   return (
     <div className={`text-center ${className}`}>

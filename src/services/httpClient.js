@@ -16,19 +16,19 @@ class HttpClient {
    * Get auth token from localStorage
    */
   getAuthToken() {
-    return localStorage.getItem('skillbridge_token');
-  }
+  return localStorage.getItem('token');
+}
 
   /**
    * Set auth token to localStorage
    */
   setAuthToken(token) {
-    if (token) {
-      localStorage.setItem('skillbridge_token', token);
-    } else {
-      localStorage.removeItem('skillbridge_token');
-    }
+  if (token) {
+    localStorage.setItem('token', token);
+  } else {
+    localStorage.removeItem('token');
   }
+}
 
   /**
    * Get headers with auth token if available
@@ -77,11 +77,11 @@ class HttpClient {
     };
 
     try {
-      console.log(`[HTTP] ${config.method || 'GET'} ${url}`);
+      console.log(`[HTTP] ${config.method || 'GET'} ${url} - httpClient.js:80`);
       const response = await fetch(url, config);
       return await this.handleResponse(response);
     } catch (error) {
-      console.error(`[HTTP Error] ${config.method || 'GET'} ${url}:`, error);
+      console.error(`[HTTP Error] ${config.method || 'GET'} ${url}: - httpClient.js:84`, error);
       throw error;
     }
   }
@@ -195,7 +195,7 @@ class HttpClient {
       xhr.timeout = 30000;
 
       // Send request
-      console.log(`[HTTP Upload] POST ${url}`);
+      console.log(`[HTTP Upload] POST ${url} - httpClient.js:198`);
       xhr.send(formData);
     });
   }
@@ -242,7 +242,7 @@ class HttpClient {
       const currentTime = Date.now() / 1000;
       return payload.exp > currentTime;
     } catch (error) {
-      console.error('Invalid token format:', error);
+      console.error('Invalid token format: - httpClient.js:245', error);
       this.setAuthToken(null);
       return false;
     }
@@ -265,7 +265,7 @@ class HttpClient {
         isActive: payload.isActive
       };
     } catch (error) {
-      console.error('Error decoding token:', error);
+      console.error('Error decoding token: - httpClient.js:268', error);
       return null;
     }
   }

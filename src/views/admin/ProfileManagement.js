@@ -29,27 +29,45 @@ export default function ProfileManagement() {
   }, []);
 
   const loadUserProfile = async () => {
+  try {
+    setLoading(true);
+    
+    // Try API first, fallback to token if needed
+    let userData;
     try {
-      setLoading(true);
-      const userData = await authService.getCurrentUser();
-      setCurrentUser(userData);
-      setProfileData({
-        fullName: userData.fullName || '',
-        email: userData.email || '',
-        school: userData.school || '',
-        major: userData.major || '',
-        academicYear: userData.academicYear || '',
-        avatarUrl: userData.avatarUrl || ''
-      });
-    } catch (error) {
-      console.error('Error loading profile: - ProfileManagement.js:45', error);
-      setMessage({ type: 'error', text: 'Không thể tải thông tin hồ sơ' });
-    } finally {
-      setLoading(false);
+      userData = await authService.getCurrentUser();
+    } catch (apiError) {
+      console.warn('API failed, using token data: - ProfileManagement.js:40', apiError.message);
+      userData = authService.getCurrentUserFromToken();
+      if (!userData) {
+        throw new Error('Không thể lấy thông tin người dùng. Vui lòng đăng nhập lại.');
+      }
     }
-  };
+    
+    setCurrentUser(userData);
+    setProfileData({
+      fullName: userData.fullName || '',
+      email: userData.email || '',
+      school: userData.school || '',
+      major: userData.major || '',
+      academicYear: userData.academicYear || '',
+      avatarUrl: userData.avatarUrl || ''
+    });
+    
+  } catch (error) {
+    console.error('Error loading profile: - ProfileManagement.js:58', error);
+    setMessage({ type: 'error', text: error.message || 'Không thể tải thông tin hồ sơ' });
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleProfileChange = (e) => {
+    if (!profileData.fullName?.trim()) {
+    setMessage({ type: 'error', text: 'Vui lòng nhập họ và tên' });
+    return;
+  }
     const { name, value } = e.target;
     setProfileData(prev => ({
       ...prev,
@@ -78,7 +96,7 @@ export default function ProfileManagement() {
       setCurrentUser(updatedUser);
 
     } catch (error) {
-      console.error('Error updating profile: - ProfileManagement.js:81', error);
+      console.error('Error updating profile: - ProfileManagement.js:99', error);
       setMessage({ type: 'error', text: error.message || 'Cập nhật thông tin thất bại' });
     } finally {
       setLoading(false);
@@ -91,7 +109,7 @@ export default function ProfileManagement() {
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setMessage({ type: 'error', text: 'Mật khẩu xác nhận không khớp' });
-      console.log({ type: 'error - ProfileManagement.js:94', text: 'Mật khẩu xác nhận không khớp' });
+      console.log({ type: 'error - ProfileManagement.js:112', text: 'Mật khẩu xác nhận không khớp' });
       return;
     }
 
@@ -117,7 +135,7 @@ export default function ProfileManagement() {
         confirmPassword: ''
       });
     } catch (error) {
-      console.error('Error changing password: - ProfileManagement.js:120', error);
+      console.error('Error changing password: - ProfileManagement.js:138', error);
       setMessage({ type: 'error', text: error.message || 'Đổi mật khẩu thất bại' });
     } finally {
       setLoading(false);

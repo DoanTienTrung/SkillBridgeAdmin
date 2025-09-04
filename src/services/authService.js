@@ -105,6 +105,18 @@ ERROR_MESSAGES = {
       console.error('❌ Get current user error: - authService.js:105', error);
       throw error;
     }
+    } catch (error) {
+  console.error('❌ Get current user error: - authService.js:109', error);
+  
+  // THÊM: Fallback to token data if API fails  
+  console.log('🔄 Fallback to token data - authService.js:112');
+  const userFromToken = this.getCurrentUserFromToken();
+  if (userFromToken) {
+    return userFromToken;
+  }
+  
+  throw error;
+
   }
 
   /**
@@ -112,7 +124,7 @@ ERROR_MESSAGES = {
    */
   async updateProfile(profileData) {
     try {
-      console.log('👤 Updating profile: - authService.js:115', profileData);
+      console.log('👤 Updating profile: - authService.js:127', profileData);
       
       // TODO: Implement backend endpoint PUT /api/users/profile
       const response = await httpClient.put(API_ENDPOINTS.PROFILE, profileData);
@@ -120,16 +132,16 @@ ERROR_MESSAGES = {
       if (response.success) {
         // Update local storage
         localStorage.setItem('skillbridge_user', JSON.stringify(response.data));
-        console.log('✅ Profile updated successfully - authService.js:123');
+        console.log('✅ Profile updated successfully - authService.js:135');
         return response.data;
       }
       
       throw new Error(response.message || 'Failed to update profile');
     } catch (error) {
-      console.error('❌ Update profile error: - authService.js:129', error);
+      console.error('❌ Update profile error: - authService.js:141', error);
       // For now, simulate success if endpoint doesn't exist yet
       if (error.message.includes('404') || error.message.includes('Not Found')) {
-        console.log('⚠️ Profile update endpoint not implemented yet, simulating success - authService.js:132');
+        console.log('⚠️ Profile update endpoint not implemented yet, simulating success - authService.js:144');
         const currentUser = this.getCurrentUserFromToken();
         const updatedUser = { ...currentUser, ...profileData };
         localStorage.setItem('skillbridge_user', JSON.stringify(updatedUser));
@@ -144,19 +156,19 @@ ERROR_MESSAGES = {
    */
   async changePassword(passwordData) {
     try {
-      console.log("Password Data: - authService.js:147", passwordData)
+      console.log("Password Data: - authService.js:159", passwordData)
       const response = await httpClient.put(API_ENDPOINTS.CHANGE_PASSWORD, passwordData);
 
-      console.log("response - authService.js:150", response)
+      console.log("response - authService.js:162", response)
       
       if (response.success) {
-        console.log('✅ Password changed successfully - authService.js:153');
+        console.log('✅ Password changed successfully - authService.js:165');
         return response.message;
       }
       
       throw new Error(response.message || 'Failed to change password');
     } catch (error) {
-      console.error('❌ Change password error: - authService.js:159', error);
+      console.error('❌ Change password error: - authService.js:171', error);
       throw error;
     }
   }
@@ -166,7 +178,7 @@ ERROR_MESSAGES = {
    */
   async uploadAvatar(file, onProgress) {
     try {
-      console.log('📷 Uploading avatar - authService.js:169');
+      console.log('📷 Uploading avatar - authService.js:181');
       
       const formData = new FormData();
       formData.append('file', file);
@@ -181,13 +193,13 @@ ERROR_MESSAGES = {
         // Update local user data
         const updatedUser = response.data;
         localStorage.setItem('skillbridge_user', JSON.stringify(updatedUser));
-        console.log('✅ Avatar uploaded successfully - authService.js:184');
+        console.log('✅ Avatar uploaded successfully - authService.js:196');
         return updatedUser;
       }
       
       throw new Error(response.message || 'Failed to upload avatar');
     } catch (error) {
-      console.error('❌ Upload avatar error: - authService.js:190', error);
+      console.error('❌ Upload avatar error: - authService.js:202', error);
       throw error;
     }
   }
@@ -205,7 +217,7 @@ ERROR_MESSAGES = {
       
       throw new Error(response.message || 'Failed to get token info');
     } catch (error) {
-      console.error('❌ Get token info error: - authService.js:208', error);
+      console.error('❌ Get token info error: - authService.js:220', error);
       throw error;
     }
   }
@@ -214,30 +226,45 @@ ERROR_MESSAGES = {
    * Logout user
    */
   async logout() {
+  try {
+    console.log('🚪 Logging out... - authService.js:230');
+    
+    // Call logout endpoint if needed
     try {
-      console.log('🚪 Logging out... - authService.js:218');
-      
-      // Call logout endpoint if needed
-      try {
-        await httpClient.post(API_ENDPOINTS.LOGOUT);
-      } catch (error) {
-        console.log('⚠️ Logout API call failed, continuing with local logout - authService.js:224');
-      }
+      await httpClient.post(API_ENDPOINTS.LOGOUT);
     } catch (error) {
-      console.error('❌ Logout API error: - authService.js:227', error);
-      // Continue with local logout even if API fails
-    } finally {
-      // Always clear local storage
-      httpClient.setAuthToken(null);
-      localStorage.removeItem('skillbridge_user');
-      localStorage.removeItem('skillbridge_remember_email');
-      
-      console.log('✅ Logout completed - authService.js:235');
-      
-      // Redirect to login
-      window.location.hash = '/auth/login';
+      console.log('⚠️ Logout API call failed, continuing with local logout - authService.js:236');
     }
+  } catch (error) {
+    console.error('❌ Logout API error: - authService.js:239', error);
+    // Continue with local logout even if API fails
+  } finally {
+    // Always clear local storage - CẬP NHẬT ĐỂ NHẤT QUÁN
+    httpClient.setAuthToken(null);
+    localStorage.removeItem('skillbridge_user');
+    localStorage.removeItem('skillbridge_remember_email');
+    
+    // THÊM: Clear cả token key cũ để đảm bảo
+    localStorage.removeItem('token');
+    localStorage.removeItem('skillbridge_token');
+    
+    console.log('✅ Logout completed - authService.js:251');
+    
+    // Redirect to login
+    window.location.hash = '/auth/login';
   }
+}
+
+// THÊM method để debug token issues:
+debugTokenIssue() {
+  console.log('🔍 Token Debug Info: - authService.js:260');
+  console.log('skillbridge_token: - authService.js:261', localStorage.getItem('skillbridge_token'));
+  console.log('token: - authService.js:262', localStorage.getItem('token'));
+  console.log('httpClient.getAuthToken(): - authService.js:263', httpClient.getAuthToken());
+  console.log('getCurrentUserFromToken(): - authService.js:264', this.getCurrentUserFromToken());
+  console.log('isAuthenticated(): - authService.js:265', this.isAuthenticated());
+  console.log('canAccessAdmin(): - authService.js:266', this.canAccessAdmin());
+}
 
   /**
    * Check if user is authenticated
@@ -261,7 +288,7 @@ ERROR_MESSAGES = {
       const userData = localStorage.getItem('skillbridge_user');
       return userData ? JSON.parse(userData) : null;
     } catch (error) {
-      console.error('Error parsing user data from localStorage: - authService.js:264', error);
+      console.error('Error parsing user data from localStorage: - authService.js:291', error);
       return null;
     }
   }
@@ -317,7 +344,7 @@ ERROR_MESSAGES = {
       const userData = await this.getCurrentUser();
       return userData;
     } catch (error) {
-      console.error('Failed to refresh user data: - authService.js:320', error);
+      console.error('Failed to refresh user data: - authService.js:347', error);
       throw error;
     }
   }
@@ -336,10 +363,10 @@ ERROR_MESSAGES = {
       
       throw new Error(response.message || 'Failed to get dashboard stats');
     } catch (error) {
-      console.error('❌ Get dashboard stats error: - authService.js:339', error);
+      console.error('❌ Get dashboard stats error: - authService.js:366', error);
       // For now, return mock data if endpoint doesn't exist
       if (error.message.includes('404') || error.message.includes('Not Found')) {
-        console.log('⚠️ Dashboard stats endpoint not implemented yet, returning mock data - authService.js:342');
+        console.log('⚠️ Dashboard stats endpoint not implemented yet, returning mock data - authService.js:369');
         return {
           totalLessons: 25,
           totalStudents: 128,
@@ -359,10 +386,10 @@ ERROR_MESSAGES = {
   async testConnection() {
     try {
       const response = await httpClient.get('/auth/test');
-      console.log('📡 API Connection Test: - authService.js:362', response);
+      console.log('📡 API Connection Test: - authService.js:389', response);
       return response;
     } catch (error) {
-      console.error('❌ API Connection Test Failed: - authService.js:365', error);
+      console.error('❌ API Connection Test Failed: - authService.js:392', error);
       throw error;
     }
   }

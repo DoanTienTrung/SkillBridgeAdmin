@@ -34,15 +34,15 @@ export default function StudentReports() {
     try {
       setLoading(true);
       setError('');
-      console.log('🔄 Loading students reports...');
+      console.log('🔄 Loading students reports... - StudentReports.js:37');
 
       const response = await analyticsService.getAllStudentsReports();
       setStudents(response.data);
       setFilteredStudents(response.data);
 
-      console.log('✅ Students reports loaded:', response.data.length, 'students');
+      console.log('✅ Students reports loaded: - StudentReports.js:43', response.data.length, 'students');
     } catch (error) {
-      console.error('❌ Error loading students reports:', error);
+      console.error('❌ Error loading students reports: - StudentReports.js:45', error);
       setError('Không thể tải danh sách báo cáo học viên. Vui lòng thử lại.');
     } finally {
       setLoading(false);
@@ -51,32 +51,32 @@ export default function StudentReports() {
 
   const handleViewReport = async (studentId) => {
     try {
-      console.log(`🔄 Loading detailed report for student ${studentId}`);
+      console.log(`🔄 Loading detailed report for student ${studentId} - StudentReports.js:54`);
       const response = await analyticsService.getStudentReport(studentId);
       setSelectedStudent(response.data);
       setReportModal(true);
     } catch (error) {
-      console.error(`❌ Error loading student ${studentId} report:`, error);
+      console.error(`❌ Error loading student ${studentId} report: - StudentReports.js:59`, error);
       alert('Không thể tải báo cáo chi tiết. Vui lòng thử lại.');
     }
   };
 
   const handleExportPdf = async (studentId) => {
     try {
-      console.log(`🔄 Exporting PDF for student ${studentId}`);
+      console.log(`🔄 Exporting PDF for student ${studentId} - StudentReports.js:66`);
       await analyticsService.exportStudentPdf(studentId);
     } catch (error) {
-      console.error(`❌ Error exporting PDF for student ${studentId}:`, error);
+      console.error(`❌ Error exporting PDF for student ${studentId}: - StudentReports.js:69`, error);
       alert('Không thể xuất file PDF. Tính năng đang được phát triển.');
     }
   };
 
   const handleExportAllExcel = async () => {
     try {
-      console.log('🔄 Exporting all students to Excel');
+      console.log('🔄 Exporting all students to Excel - StudentReports.js:76');
       await analyticsService.exportStudentsExcel();
     } catch (error) {
-      console.error('❌ Error exporting Excel:', error);
+      console.error('❌ Error exporting Excel: - StudentReports.js:79', error);
       alert('Không thể xuất file Excel. Tính năng đang được phát triển.');
     }
   };
@@ -269,7 +269,7 @@ export default function StudentReports() {
                             <div className="flex space-x-2">
                               <button
                                 onClick={() => handleViewReport(student.studentId)}
-                                className="bg-lightBlue-500 text-white active:bg-lightBlue-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none ease-linear transition-all duration-150"
+                                className="bg-lightBlue-500 text-black active:bg-lightBlue-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none ease-linear transition-all duration-150"
                                 title="Xem báo cáo chi tiết"
                               >
                                 <i className="fas fa-eye"></i>

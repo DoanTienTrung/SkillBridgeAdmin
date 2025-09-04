@@ -10,20 +10,97 @@ class UserService {
    * Lấy tất cả users với filter theo role
    */
   async getAllUsers(role = null) {
-    try {
-      const params = role ? { role } : {};
-      const response = await httpClient.get('/users', params);
-      
-      if (response.success) {
-        return response.data;
-      }
-      
-      throw new Error(response.message || 'Failed to get users');
-    } catch (error) {
-      console.error('Error getting users: - userService.js:23', error);
-      throw error;
+  try {
+    console.log('🔄 userService.getAllUsers  Role: - userService.js:14', role);
+    
+    // Nếu role là STUDENT, dùng endpoint chuyên dụng
+    if (role === 'STUDENT') {
+      console.log('🔄 Using dedicated students endpoint /users/students - userService.js:18');
+      return await this.getAllStudents();
     }
+    
+    // Cho các role khác, dùng endpoint general
+    const params = role ? { role } : {};
+    const response = await httpClient.get('/users', params);
+    
+    console.log('✅ userService.getAllUsers  Raw response: - userService.js:26', response);
+    
+    // Xử lý response
+    if (response && Array.isArray(response)) {
+      console.log('✅ userService.getAllUsers  Success, count: - userService.js:30', response.length);
+      return response;
+    }
+    
+    // Nếu response có format legacy
+    if (response && response.success && Array.isArray(response.data)) {
+      console.log('✅ userService.getAllUsers  Legacy format, count: - userService.js:36', response.data.length);
+      return response.data;
+    }
+    
+    console.warn('⚠️ userService.getAllUsers  Unexpected response format: - userService.js:40', response);
+    return [];
+    
+  } catch (error) {
+    console.error('❌ userService.getAllUsers  Error: - userService.js:44', error);
+    
+    // Nếu là STUDENT role và lỗi, thử fallback
+    if (role === 'STUDENT') {
+      console.log('🔄 Fallback: trying general endpoint for students - userService.js:48');
+      try {
+        const params = { role: 'STUDENT' };
+        const fallbackResponse = await httpClient.get('/users', params);
+        
+        if (fallbackResponse && Array.isArray(fallbackResponse)) {
+          return fallbackResponse;
+        }
+        if (fallbackResponse && fallbackResponse.success && Array.isArray(fallbackResponse.data)) {
+          return fallbackResponse.data;
+        }
+      } catch (fallbackError) {
+        console.error('❌ Fallback also failed: - userService.js:60', fallbackError);
+      }
+    }
+    
+    throw error;
   }
+}
+
+// Cũng cập nhật method getAllStudents:
+async getAllStudents() {
+  try {
+    console.log('🔄 userService.getAllStudents  Using /users/students endpoint - userService.js:71');
+    
+    const response = await httpClient.get('/users/students');
+    
+    console.log('✅ userService.getAllStudents  Raw response: - userService.js:75', response);
+    
+    // Xử lý response theo format của backend
+    if (response && response.success && Array.isArray(response.data)) {
+      console.log('✅ userService.getAllStudents  Success, count: - userService.js:79', response.data.length);
+      return response.data;
+    }
+    
+    // Nếu response trả về trực tiếp array (không wrap)
+    if (response && Array.isArray(response)) {
+      console.log('✅ userService.getAllStudents  Direct array, count: - userService.js:85', response.length);
+      return response;
+    }
+    
+    console.warn('⚠️ userService.getAllStudents  Unexpected response: - userService.js:89', response);
+    return [];
+    
+  } catch (error) {
+    console.error('❌ userService.getAllStudents  Error: - userService.js:93', error);
+    console.error('❌ Error details: - userService.js:94', {
+      message: error.message,
+      response: error.response,
+      status: error.response?.status
+    });
+    
+    // Không fallback ở đây, để caller xử lý
+    throw error;
+  }
+}
 
   /**
    * Lấy user theo ID
@@ -32,34 +109,23 @@ class UserService {
     try {
       const response = await httpClient.get(`/users/${id}`);
       
-      if (response.success) {
+      // Handle both direct data and wrapped response
+      if (response && response.id) {
+        return response;
+      }
+      
+      if (response && response.success && response.data) {
         return response.data;
       }
       
-      throw new Error(response.message || 'Failed to get user');
+      throw new Error('User not found or invalid response');
     } catch (error) {
-      console.error('Error getting user by ID: - userService.js:41', error);
+      console.error('Error getting user by ID: - userService.js:123', error);
       throw error;
     }
   }
 
-  /**
-   * Lấy danh sách students (cho teacher/admin)
-   */
-  async getAllStudents() {
-    try {
-      const response = await httpClient.get('/users/students');
-      
-      if (response.success) {
-        return response.data;
-      }
-      
-      throw new Error(response.message || 'Failed to get students');
-    } catch (error) {
-      console.error('Error getting students: - userService.js:59', error);
-      throw error;
-    }
-  }
+  
 
   /**
    * Tạo user mới
@@ -68,13 +134,17 @@ class UserService {
     try {
       const response = await httpClient.post('/users', userData);
       
-      if (response.success) {
-        return response.data;
+      if (response && response.id) {
+        return response;
       }
       
-      throw new Error(response.message || 'Failed to create user');
+      if (response && response.success) {
+        return response.data || response;
+      }
+      
+      throw new Error('Failed to create user');
     } catch (error) {
-      console.error('Error creating user: - userService.js:77', error);
+      console.error('Error creating user: - userService.js:147', error);
       throw error;
     }
   }
@@ -86,13 +156,17 @@ class UserService {
     try {
       const response = await httpClient.put(`/users/${id}`, userData);
       
-      if (response.success) {
-        return response.data;
+      if (response && response.id) {
+        return response;
       }
       
-      throw new Error(response.message || 'Failed to update user');
+      if (response && response.success) {
+        return response.data || response;
+      }
+      
+      throw new Error('Failed to update user');
     } catch (error) {
-      console.error('Error updating user: - userService.js:95', error);
+      console.error('Error updating user: - userService.js:169', error);
       throw error;
     }
   }
@@ -103,50 +177,51 @@ class UserService {
   async deleteUser(id) {
     try {
       const response = await httpClient.delete(`/users/${id}`);
-      
-      if (response.success) {
-        return response.data;
-      }
-      
-      throw new Error(response.message || 'Failed to delete user');
+      return response;
     } catch (error) {
-      console.error('Error deleting user: - userService.js:113', error);
+      console.error('Error deleting user: - userService.js:182', error);
       throw error;
     }
   }
 
   /**
-   * Toggle user active status
+   * Toggle user active status - Fixed for both endpoints
    */
-  async toggleUserActive(id) {
+  async toggleUserStatus(id) {
     try {
-      const response = await httpClient.put(`/users/${id}/toggle-active`);
-      
-      if (response.success) {
-        return response.data;
+      // Try the correct backend endpoint first
+      let response;
+      try {
+        response = await httpClient.put(`/users/${id}/toggle-active`);
+      } catch (error) {
+        // Fallback to alternative endpoint
+        console.log('Trying alternative endpoint... - userService.js:198');
+        response = await httpClient.put(`/users/users/${id}/toggle-status`);
       }
       
-      throw new Error(response.message || 'Failed to toggle user status');
+      return response;
     } catch (error) {
-      console.error('Error toggling user status: - userService.js:131', error);
+      console.error('Error toggling user status: - userService.js:204', error);
       throw error;
     }
   }
 
   /**
-   * Reset user password
+   * Reset user password - Fixed for both endpoints  
    */
   async resetPassword(id) {
     try {
-      const response = await httpClient.post(`/users/${id}/reset-password`);
-      
-      if (response.success) {
-        return response.data;
+      let response;
+      try {
+        response = await httpClient.post(`/users/${id}/reset-password`);
+      } catch (error) {
+        // Try alternative endpoint
+        response = await httpClient.post(`/users/users/${id}/reset-password`);
       }
       
-      throw new Error(response.message || 'Failed to reset password');
+      return response;
     } catch (error) {
-      console.error('Error resetting password: - userService.js:149', error);
+      console.error('Error resetting password: - userService.js:224', error);
       throw error;
     }
   }
@@ -158,19 +233,18 @@ class UserService {
     try {
       const response = await httpClient.get('/users/stats');
       
-      if (response.success) {
-        return {
-          totalUsers: response.data.totalUsers || 0,
-          activeUsers: response.data.activeUsers || 0,
-          studentsCount: response.data.studentsCount || 0,
-          teachersCount: response.data.teachersCount || 0,
-          adminsCount: response.data.adminsCount || 0
-        };
-      }
+      // Handle direct response or wrapped response
+      const data = response.data || response;
       
-      throw new Error(response.message || 'Failed to get user stats');
+      return {
+        totalUsers: data.totalUsers || 0,
+        activeUsers: data.activeUsers || 0,
+        studentsCount: data.studentsCount || 0,
+        teachersCount: data.teachersCount || 0,
+        adminsCount: data.adminsCount || 0
+      };
     } catch (error) {
-      console.error('Error getting user stats: - userService.js:173', error);
+      console.error('Error getting user stats: - userService.js:247', error);
       // Return default stats if API fails
       return {
         totalUsers: 0,
@@ -189,17 +263,13 @@ class UserService {
    */
   async getStudentStats() {
     try {
-      console.log('📤 Fetching student stats... - userService.js:192');
+      console.log('📤 Fetching student stats... - userService.js:266');
       const response = await httpClient.get(API_ENDPOINTS.STUDENT_STATS);
       
-      if (response.success) {
-        console.log('✅ Student stats fetched successfully: - userService.js:196', response);
-        return response;
-      }
-      
-      throw new Error(response.message || 'Failed to get student stats');
+      console.log('✅ Student stats fetched successfully: - userService.js:269', response);
+      return response;
     } catch (error) {
-      console.error('❌ Error getting student stats: - userService.js:202', error);
+      console.error('❌ Error getting student stats: - userService.js:272', error);
       throw error;
     }
   }
@@ -209,17 +279,13 @@ class UserService {
    */
   async getStudentProgress(timeRange = 'week') {
     try {
-      console.log('📤 Fetching student progress... - userService.js:212');
+      console.log('📤 Fetching student progress... - userService.js:282');
       const response = await httpClient.get(`${API_ENDPOINTS.STUDENT_PROGRESS}?timeRange=${timeRange}`);
       
-      if (response.success) {
-        console.log('✅ Student progress fetched successfully: - userService.js:216', response);
-        return response;
-      }
-      
-      throw new Error(response.message || 'Failed to get student progress');
+      console.log('✅ Student progress fetched successfully: - userService.js:285', response);
+      return response;
     } catch (error) {
-      console.error('❌ Error getting student progress: - userService.js:222', error);
+      console.error('❌ Error getting student progress: - userService.js:288', error);
       throw error;
     }
   }
@@ -229,17 +295,13 @@ class UserService {
    */
   async getRecentLessons(limit = 5) {
     try {
-      console.log('📤 Fetching recent lessons... - userService.js:232');
+      console.log('📤 Fetching recent lessons... - userService.js:298');
       const response = await httpClient.get(`${API_ENDPOINTS.STUDENT_RECENT_LESSONS}?limit=${limit}`);
       
-      if (response.success) {
-        console.log('✅ Recent lessons fetched successfully: - userService.js:236', response);
-        return response;
-      }
-      
-      throw new Error(response.message || 'Failed to get recent lessons');
+      console.log('✅ Recent lessons fetched successfully: - userService.js:301', response);
+      return response;
     } catch (error) {
-      console.error('❌ Error getting recent lessons: - userService.js:242', error);
+      console.error('❌ Error getting recent lessons: - userService.js:304', error);
       throw error;
     }
   }
@@ -250,14 +312,9 @@ class UserService {
   async getProfile() {
     try {
       const response = await httpClient.get(API_ENDPOINTS.PROFILE);
-      
-      if (response.success) {
-        return response.data;
-      }
-      
-      throw new Error(response.message || 'Failed to get profile');
+      return response.data || response;
     } catch (error) {
-      console.error('Error getting profile: - userService.js:260', error);
+      console.error('Error getting profile: - userService.js:317', error);
       throw error;
     }
   }
@@ -268,14 +325,9 @@ class UserService {
   async updateProfile(profileData) {
     try {
       const response = await httpClient.put(API_ENDPOINTS.PROFILE, profileData);
-      
-      if (response.success) {
-        return response.data;
-      }
-      
-      throw new Error(response.message || 'Failed to update profile');
+      return response.data || response;
     } catch (error) {
-      console.error('Error updating profile: - userService.js:278', error);
+      console.error('Error updating profile: - userService.js:330', error);
       throw error;
     }
   }
@@ -286,14 +338,9 @@ class UserService {
   async changePassword(passwordData) {
     try {
       const response = await httpClient.put(API_ENDPOINTS.CHANGE_PASSWORD, passwordData);
-      
-      if (response.success) {
-        return response.data;
-      }
-      
-      throw new Error(response.message || 'Failed to change password');
+      return response.data || response;
     } catch (error) {
-      console.error('Error changing password: - userService.js:296', error);
+      console.error('Error changing password: - userService.js:343', error);
       throw error;
     }
   }
@@ -304,14 +351,9 @@ class UserService {
   async updateAvatar(avatarUrl) {
     try {
       const response = await httpClient.put(`${API_ENDPOINTS.UPDATE_AVATAR}?avatarUrl=${encodeURIComponent(avatarUrl)}`);
-      
-      if (response.success) {
-        return response.data;
-      }
-      
-      throw new Error(response.message || 'Failed to update avatar');
+      return response.data || response;
     } catch (error) {
-      console.error('Error updating avatar: - userService.js:314', error);
+      console.error('Error updating avatar: - userService.js:356', error);
       throw error;
     }
   }
@@ -327,14 +369,9 @@ class UserService {
       if (role) params.role = role;
       
       const response = await httpClient.get('/users/search', params);
-      
-      if (response.success) {
-        return response.data;
-      }
-      
-      throw new Error(response.message || 'Failed to search users');
+      return response.data || response;
     } catch (error) {
-      console.error('Error searching users: - userService.js:337', error);
+      console.error('Error searching users: - userService.js:374', error);
       throw error;
     }
   }
@@ -348,14 +385,9 @@ class UserService {
         userIds,
         status
       });
-      
-      if (response.success) {
-        return response.data;
-      }
-      
-      throw new Error(response.message || 'Failed to bulk update status');
+      return response.data || response;
     } catch (error) {
-      console.error('Error bulk updating status: - userService.js:358', error);
+      console.error('Error bulk updating status: - userService.js:390', error);
       throw error;
     }
   }
@@ -365,14 +397,9 @@ class UserService {
       const response = await httpClient.post('/users/bulk-delete', {
         userIds
       });
-      
-      if (response.success) {
-        return response.data;
-      }
-      
-      throw new Error(response.message || 'Failed to bulk delete users');
+      return response.data || response;
     } catch (error) {
-      console.error('Error bulk deleting users: - userService.js:375', error);
+      console.error('Error bulk deleting users: - userService.js:402', error);
       throw error;
     }
   }
@@ -386,16 +413,89 @@ class UserService {
       if (role) params.role = role;
       
       const response = await httpClient.get('/users/export', params);
-      
-      if (response.success) {
-        return response.data;
-      }
-      
-      throw new Error(response.message || 'Failed to export users');
+      return response.data || response;
     } catch (error) {
-      console.error('Error exporting users: - userService.js:396', error);
+      console.error('Error exporting users: - userService.js:418', error);
       throw error;
     }
+  }
+
+  /**
+   * Debug method to test API endpoints
+   */
+  async testApiEndpoints() {
+    const results = {
+      endpoints: {},
+      auth: {},
+      errors: []
+    };
+
+    try {
+      // Test authentication
+      const token = localStorage.getItem('token');
+      results.auth.hasToken = !!token;
+      results.auth.tokenLength = token ? token.length : 0;
+
+      // Test /users endpoint
+      try {
+        console.log('🧪 Testing /users endpoint... - userService.js:441');
+        const usersResponse = await httpClient.get('/users');
+        results.endpoints['/users'] = {
+          success: true,
+          dataType: Array.isArray(usersResponse) ? 'array' : typeof usersResponse,
+          count: Array.isArray(usersResponse) ? usersResponse.length : 0
+        };
+      } catch (error) {
+        results.endpoints['/users'] = {
+          success: false,
+          error: error.message,
+          status: error.response?.status
+        };
+        results.errors.push(`/users: ${error.message}`);
+      }
+
+      // Test /users/students endpoint
+      try {
+        console.log('🧪 Testing /users/students endpoint... - userService.js:459');
+        const studentsResponse = await httpClient.get('/users/students');
+        results.endpoints['/users/students'] = {
+          success: true,
+          dataType: Array.isArray(studentsResponse) ? 'array' : typeof studentsResponse,
+          count: Array.isArray(studentsResponse) ? studentsResponse.length : 0
+        };
+      } catch (error) {
+        results.endpoints['/users/students'] = {
+          success: false,
+          error: error.message,
+          status: error.response?.status
+        };
+        results.errors.push(`/users/students: ${error.message}`);
+      }
+
+      // Test /users?role=STUDENT endpoint
+      try {
+        console.log('🧪 Testing /users?role=STUDENT endpoint... - userService.js:477');
+        const roleResponse = await httpClient.get('/users', { role: 'STUDENT' });
+        results.endpoints['/users?role=STUDENT'] = {
+          success: true,
+          dataType: Array.isArray(roleResponse) ? 'array' : typeof roleResponse,
+          count: Array.isArray(roleResponse) ? roleResponse.length : 0
+        };
+      } catch (error) {
+        results.endpoints['/users?role=STUDENT'] = {
+          success: false,
+          error: error.message,
+          status: error.response?.status
+        };
+        results.errors.push(`/users?role=STUDENT: ${error.message}`);
+      }
+
+    } catch (error) {
+      results.errors.push(`General error: ${error.message}`);
+    }
+
+    console.log('🧪 API Test Results: - userService.js:497', results);
+    return results;
   }
 }
 

@@ -182,29 +182,29 @@ export default function TeacherSidebar() {
             <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
               Chức năng
             </h6>
-             <ul className="md:flex-col md:min-w-full flex flex-col list-none">
-            {/* Content Management */}
-            <li className="items-center">
-              <Link
-                className={
-                  "text-xs uppercase py-3 font-bold block " +
-                  (isActive("/teacher/create-lesson")
-                    ? "text-lightBlue-500 hover:text-lightBlue-600"
-                    : "text-blueGray-700 hover:text-blueGray-500")
-                }
-                to="/teacher/create-lesson"
-              >
-                <i
+            <ul className="md:flex-col md:min-w-full flex flex-col list-none">
+              {/* Content Management */}
+              <li className="items-center">
+                <Link
                   className={
-                    "fas fa-plus-circle mr-2 text-sm " +
+                    "text-xs uppercase py-3 font-bold block " +
                     (isActive("/teacher/create-lesson")
-                      ? "opacity-75"
-                      : "text-blueGray-300")
+                      ? "text-lightBlue-500 hover:text-lightBlue-600"
+                      : "text-blueGray-700 hover:text-blueGray-500")
                   }
-                ></i>{" "}
-                Tạo bài học
-              </Link>
-            </li>
+                  to="/teacher/create-lesson"
+                >
+                  <i
+                    className={
+                      "fas fa-plus-circle mr-2 text-sm " +
+                      (isActive("/teacher/create-lesson")
+                        ? "opacity-75"
+                        : "text-blueGray-300")
+                    }
+                  ></i>{" "}
+                  Tạo bài học
+                </Link>
+              </li>
 
               <li className="items-center">
                 <Link
@@ -232,7 +232,7 @@ export default function TeacherSidebar() {
                 <Link
                   className={
                     "text-xs uppercase py-3 font-bold block " +
-                    (isActive("/teacher/students")
+                    (window.location.href.indexOf("/teacher/students") !== -1
                       ? "text-lightBlue-500 hover:text-lightBlue-600"
                       : "text-blueGray-700 hover:text-blueGray-500")
                   }
@@ -240,8 +240,8 @@ export default function TeacherSidebar() {
                 >
                   <i
                     className={
-                      "fas fa-users mr-2 text-sm " +
-                      (isActive("/teacher/students")
+                      "fas fa-user-graduate mr-2 text-sm " +
+                      (window.location.href.indexOf("/teacher/students") !== -1
                         ? "opacity-75"
                         : "text-blueGray-300")
                     }
@@ -282,27 +282,6 @@ export default function TeacherSidebar() {
                 </h6>
 
                 <ul className="md:flex-col md:min-w-full flex flex-col list-none">
-                  <li className="items-center">
-                    <Link
-                      className={
-                        "text-xs uppercase py-3 font-bold block " +
-                        (isActive("/teacher/settings")
-                          ? "text-lightBlue-500 hover:text-lightBlue-600"
-                          : "text-blueGray-700 hover:text-blueGray-500")
-                      }
-                      to="/teacher/settings"
-                    >
-                      <i
-                        className={
-                          "fas fa-cogs mr-2 text-sm " +
-                          (isActive("/teacher/settings")
-                            ? "opacity-75"
-                            : "text-blueGray-300")
-                        }
-                      ></i>{" "}
-                      Cài đặt
-                    </Link>
-                  </li>
 
                   <li className="items-center">
                     <button
