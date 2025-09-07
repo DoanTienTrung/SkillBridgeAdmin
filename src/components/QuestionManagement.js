@@ -17,7 +17,7 @@ export default function QuestionManagement({ lessonId, lessonType, onQuestionsCh
       const response = await questionService.getQuestionsByLesson(lessonId, lessonType);
       setQuestions(response.data || []);
     } catch (error) {
-      console.error('Failed to load questions:', error);
+      console.error('Failed to load questions: - QuestionManagement.js:20', error);
       setError('Không thể tải danh sách câu hỏi');
       setQuestions([]);
     } finally {
@@ -81,7 +81,7 @@ export default function QuestionManagement({ lessonId, lessonType, onQuestionsCh
         <h3 className="text-lg font-semibold">Quản lý câu hỏi ({questions.length})</h3>
         <button
           onClick={() => setEditingQuestion({})}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="bg-blue-500 text-black px-4 py-2 rounded hover:bg-blue-600"
         >
           <i className="fas fa-plus mr-2"></i>
           Thêm câu hỏi

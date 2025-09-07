@@ -1,11 +1,91 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import authService from "../../services/authService";
 
 export default function StudentSidebar() {
-  const [collapseShow, setCollapseShow] = React.useState("hidden");
-  const user = authService.getCurrentUserFromToken();
+  const [collapseShow, setCollapseShow] = useState("hidden");
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  useEffect(() => {
+    const initializeUser = () => {
+      try {
+        // Validate và clean tokens trước
+        const isValidToken = authService.validateAndCleanTokens();
+        
+        if (!isValidToken) {
+          console.log('Invalid token detected, redirecting to login - StudentSidebar.js:18');
+          setError('Phiên đăng nhập không hợp lệ');
+          setLoading(false);
+          // Redirect sau một chút để hiển thị thông báo
+          setTimeout(() => {
+            authService.logout();
+          }, 2000);
+          return;
+        }
+
+        // Lấy thông tin user
+        const currentUser = authService.getCurrentUserFromToken();
+        
+        if (currentUser) {
+          setUser(currentUser);
+          setError(null);
+        } else {
+          console.log('No user found, redirecting to login - StudentSidebar.js:35');
+          setError('Không tìm thấy thông tin người dùng');
+          setTimeout(() => {
+            authService.logout();
+          }, 2000);
+        }
+      } catch (error) {
+        console.error('Error initializing user - StudentSidebar.js:42', error);
+        setError('Lỗi khi tải thông tin người dùng');
+        
+        // Debug thông tin token
+        authService.debugTokenIssue();
+        
+        setTimeout(() => {
+          authService.logout();
+        }, 2000);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeUser();
+  }, []);
+
+  // Loading state
+  if (loading) {
+    return (
+      <nav className="md:left-0 md:block md:fixed md:top-0 md:bottom-0 md:overflow-y-auto md:flex-row md:flex-nowrap md:overflow-hidden shadow-xl bg-white flex flex-wrap items-center justify-between relative md:w-64 z-10 py-4 px-6">
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <i className="fas fa-spinner fa-spin text-2xl text-blueGray-400 mb-2"></i>
+            <p className="text-blueGray-500 text-sm">Đang tải...</p>
+          </div>
+        </div>
+      </nav>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <nav className="md:left-0 md:block md:fixed md:top-0 md:bottom-0 md:overflow-y-auto md:flex-row md:flex-nowrap md:overflow-hidden shadow-xl bg-red-50 flex flex-wrap items-center justify-between relative md:w-64 z-10 py-4 px-6">
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <i className="fas fa-exclamation-triangle text-2xl text-red-500 mb-2"></i>
+            <p className="text-red-600 text-sm font-medium mb-2">{error}</p>
+            <p className="text-red-500 text-xs">Đang chuyển về trang đăng nhập...</p>
+          </div>
+        </div>
+      </nav>
+    );
+  }
+
+  // Normal state
   return (
     <>
       <nav className="md:left-0 md:block md:fixed md:top-0 md:bottom-0 md:overflow-y-auto md:flex-row md:flex-nowrap md:overflow-hidden shadow-xl bg-white flex flex-wrap items-center justify-between relative md:w-64 z-10 py-4 px-6">
@@ -18,9 +98,9 @@ export default function StudentSidebar() {
             SkillBridge Student
           </Link>
 
-          {/* User info */}
+          {/* User info with error handling */}
           <div className="md:block text-left text-blueGray-500 mr-0 inline-block whitespace-nowrap text-xs p-4 px-0">
-            Xin chào, {user?.fullName || 'Student'}! 👋
+            Xin chào, {user?.fullName || user?.email || 'Student'}! 👋
           </div>
 
           {/* Toggle button */}
@@ -123,8 +203,13 @@ export default function StudentSidebar() {
                 <button
                   className="text-xs uppercase py-3 font-bold block text-red-500 hover:text-red-600 w-full text-left"
                   onClick={() => {
-                    authService.logout();
-                    window.location.href = '/auth/login';
+                    try {
+                      authService.logout();
+                    } catch (error) {
+                      console.error('Logout error - StudentSidebar.js:209', error);
+                      // Force redirect even if logout fails
+                      window.location.href = '/auth/login';
+                    }
                   }}
                 >
                   <i className="fas fa-sign-out-alt mr-2 text-sm"></i>

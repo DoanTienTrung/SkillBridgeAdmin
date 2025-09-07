@@ -42,8 +42,6 @@ export const API_ENDPOINTS = {
   AUDIO_UPLOAD: '/audio/upload',
   AUDIO_DELETE: (fileName) => `/audio/${fileName}`,
 
-
-  
   QUESTIONS: '/questions',
 
   READING_LESSONS: '/reading-lessons',
@@ -54,6 +52,25 @@ export const API_ENDPOINTS = {
   
   // Categories
   CATEGORIES: '/categories',
+  
+  // ===== PERSONAL VOCABULARY ENDPOINTS =====
+  // Lấy danh sách từ vựng cá nhân
+  MY_VOCABULARY: '/vocabulary/my-vocabulary',
+  
+  // Lưu từ mới vào danh sách cá nhân
+  SAVE_VOCABULARY: '/vocabulary/save',
+  
+  // Cập nhật trạng thái từ vựng (learning/mastered/difficult)
+  UPDATE_VOCABULARY_STATUS: (id) => `/vocabulary/${id}/status`,
+  
+  // Xóa từ vựng khỏi danh sách cá nhân
+  REMOVE_VOCABULARY: (id) => `/vocabulary/${id}`,
+  
+  // Tra từ điển
+  LOOKUP_WORD: (word) => `/vocabulary/lookup/${encodeURIComponent(word)}`,
+  
+  // Lấy thống kê từ vựng
+  VOCABULARY_STATS: '/vocabulary/stats',
   
   // Student APIs (through UserController)
   STUDENT_STATS: '/users/student/stats',
@@ -84,8 +101,4 @@ export const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500
 };
 
-
-
 export default API_BASE_URL;
-
-

@@ -170,7 +170,7 @@ export default function LessonCard({ lesson, progress = null }) {
           <div className="text-center">
             <button
               onClick={handleStartLesson}
-              className="bg-blue-600 hover:bg-blue-700 text-black text-lg py-2 px-4 rounded-lg border border-black shadow-md transition-all duration-200 transform hover:scale-105 mx-auto"
+              className="bg-blue-500 hover:bg-blue-600 text-black text-lg py-2 px-4 rounded-lg border border-black shadow-md transition-all duration-200 transform hover:scale-105 mx-auto"
             >
               {progress && progress.completionPercentage > 0 ? (
                 <>Tiếp tục học</>

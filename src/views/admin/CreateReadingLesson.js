@@ -380,7 +380,7 @@ export default function CreateReadingLesson() {
                     </div>
 
                     {/* Breadcrumb */}
-                    <div className="breadcrumb-container">
+                    {/* <div className="breadcrumb-container">
                         <nav className="breadcrumb-nav">
                             <i className="fas fa-home"></i>
                             <span>Trang chủ</span>
@@ -389,7 +389,7 @@ export default function CreateReadingLesson() {
                             <i className="fas fa-chevron-right text-xs"></i>
                             <span className="breadcrumb-active">Tạo bài đọc</span>
                         </nav>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Error Alert */}

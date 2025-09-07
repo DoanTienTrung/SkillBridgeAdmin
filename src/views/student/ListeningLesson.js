@@ -10,7 +10,7 @@ export default function ListeningLesson() {
   const [lesson, setLesson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Vocabulary modal state
   const [selectedWord, setSelectedWord] = useState('');
   const [showVocabularyModal, setShowVocabularyModal] = useState(false);
@@ -23,7 +23,7 @@ export default function ListeningLesson() {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Thử dùng student API trước
       let response;
       try {
@@ -32,7 +32,7 @@ export default function ListeningLesson() {
         // Fallback về API thường
         response = await lessonService.getLessonById(id, 'listening');
       }
-      
+
       if (response.success && response.data) {
         setLesson(response.data);
       } else {
@@ -47,7 +47,7 @@ export default function ListeningLesson() {
   };
 
   // ==================== NAVIGATION HANDLERS ====================
-  
+
   const handleBackToLessons = () => {
     // Navigate trực tiếp đến trang danh sách bài học
     history.push('/student/lessons');
@@ -146,28 +146,8 @@ export default function ListeningLesson() {
   return (
     <div className="flex-1 bg-blueGray-50 p-4">
       <div className="max-w-6xl mx-auto">
+
         
-        {/* ==================== BREADCRUMB NAVIGATION ==================== */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-          <div className="flex items-center text-sm text-gray-600">
-            <button
-              onClick={handleGoToDashboard}
-              className="hover:text-blue-600 transition-colors"
-            >
-              <i className="fas fa-home mr-1"></i>
-              Dashboard
-            </button>
-            <i className="fas fa-chevron-right mx-2 text-gray-400"></i>
-            <button
-              onClick={handleBackToLessons}
-              className="hover:text-blue-600 transition-colors"
-            >
-              Bài học
-            </button>
-            <i className="fas fa-chevron-right mx-2 text-gray-400"></i>
-            <span className="text-gray-900 font-medium">Bài nghe</span>
-          </div>
-        </div>
 
         {/* ==================== HEADER ==================== */}
         <div className="flex items-center justify-between mb-6">
@@ -182,7 +162,7 @@ export default function ListeningLesson() {
               >
                 <i className="fas fa-list text-orange-600 group-hover:text-orange-700"></i>
               </button>
-              
+
               {/* Secondary: Browser Back */}
               <button
                 onClick={handleBrowserBack}
@@ -192,7 +172,7 @@ export default function ListeningLesson() {
                 <i className="fas fa-arrow-left text-gray-600 group-hover:text-gray-700"></i>
               </button>
             </div>
-            
+
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{lesson.title}</h1>
               <div className="flex items-center mt-1">
@@ -282,20 +262,22 @@ export default function ListeningLesson() {
           )}
 
           {/* Listening Stats */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-orange-50 p-4 rounded-lg text-center">
+          <div className="flex gap-4 mb-6">
+            <div className="flex-1 bg-orange-50 p-4 rounded-lg text-center">
               <div className="text-2xl font-bold text-orange-600">
                 {lesson.durationSeconds ? Math.ceil(lesson.durationSeconds / 60) : 'N/A'}
               </div>
               <div className="text-sm text-gray-600">Phút</div>
             </div>
-            <div className="bg-blue-50 p-4 rounded-lg text-center">
+
+            <div className="flex-1 bg-blue-50 p-4 rounded-lg text-center">
               <div className="text-2xl font-bold text-blue-600">
                 {lesson.transcript ? lesson.transcript.split(' ').length : 'N/A'}
               </div>
               <div className="text-sm text-gray-600">Từ</div>
             </div>
-            <div className="bg-green-50 p-4 rounded-lg text-center">
+
+            <div className="flex-1 bg-green-50 p-4 rounded-lg text-center">
               <div className="text-2xl font-bold text-green-600">
                 {lesson.level || 'N/A'}
               </div>
@@ -308,7 +290,7 @@ export default function ListeningLesson() {
             {/* Làm bài tập */}
             <button
               onClick={handleStartQuiz}
-              className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md flex items-center transition-all transform hover:scale-105"
+              className="bg-orange-500 hover:bg-orange-600 text-white  py-3 px-6 rounded-lg shadow-md flex items-center transition-all transform hover:scale-105"
             >
               <i className="fas fa-question-circle mr-2"></i>
               Làm bài tập
@@ -323,7 +305,7 @@ export default function ListeningLesson() {
                   audioPlayer.play();
                 }
               }}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md flex items-center transition-all transform hover:scale-105"
+              className="bg-blue-500 hover:bg-blue-600 text-black  py-3 px-6 rounded-lg shadow-md flex items-center transition-all transform hover:scale-105"
             >
               <i className="fas fa-redo mr-2"></i>
               Phát lại
@@ -334,7 +316,7 @@ export default function ListeningLesson() {
               <a
                 href={lesson.audioUrl}
                 download
-                className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md flex items-center transition-all transform hover:scale-105"
+                className="bg-green-500 hover:bg-green-600 text-black  py-3 px-6 rounded-lg shadow-md flex items-center transition-all transform hover:scale-105"
               >
                 <i className="fas fa-download mr-2"></i>
                 Tải audio
@@ -351,7 +333,7 @@ export default function ListeningLesson() {
               <i className="fas fa-arrow-left mr-2"></i>
               Về danh sách bài học
             </button>
-            
+
             <div className="flex items-center space-x-4">
               <button
                 onClick={handleGoToDashboard}

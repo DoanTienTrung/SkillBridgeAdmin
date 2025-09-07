@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import lessonService from '../../services/lessonService';
+import SaveVocabularyModal from '../../components/Student/SaveVocabularyModal';
+import Toast from '../../components/Toast';
 
 export default function ReadingLesson() {
   const { id } = useParams();
@@ -14,6 +16,13 @@ export default function ReadingLesson() {
     estimatedTime: 0,
     totalWords: 0
   });
+  
+  // Vocabulary modal states
+  const [showVocabularyModal, setShowVocabularyModal] = useState(false);
+  const [selectedText, setSelectedText] = useState('');
+  
+  // Toast state
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     fetchLesson();
@@ -29,10 +38,10 @@ export default function ReadingLesson() {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Sử dụng API endpoint đúng cho student
       const response = await lessonService.getStudentLessonById(id, 'reading');
-      
+
       if (response.success && response.data) {
         setLesson(response.data);
       } else {
@@ -45,7 +54,7 @@ export default function ReadingLesson() {
         }
       }
     } catch (error) {
-      console.error('Error fetching lesson: - ReadingLesson.js:48', error);
+      console.error('Error fetching lesson: - ReadingLesson.js:57', error);
       setError('Không thể tải bài học. Vui lòng thử lại.');
     } finally {
       setLoading(false);
@@ -54,12 +63,12 @@ export default function ReadingLesson() {
 
   const calculateReadingStats = (content) => {
     if (!content) return;
-    
+
     const words = content.trim().split(/\s+/).filter(word => word.length > 0);
     const totalWords = words.length;
     const wordsPerMinute = 250; // Average reading speed
     const estimatedTime = Math.ceil(totalWords / wordsPerMinute);
-    
+
     setReadingStats({
       wordsPerMinute,
       estimatedTime,
@@ -76,7 +85,7 @@ export default function ReadingLesson() {
   };
 
   // ==================== NAVIGATION HANDLERS ====================
-  
+
   const handleBackToLessons = () => {
     // Navigate trực tiếp đến trang danh sách bài học
     history.push('/student/lessons');
@@ -104,8 +113,30 @@ export default function ReadingLesson() {
   };
 
   const handleSaveVocabulary = () => {
-    // TODO: Implement vocabulary saving functionality
-    alert('Chức năng lưu từ vựng sẽ được phát triển sau');
+    // Get selected text from window selection
+    const selection = window.getSelection();
+    const selectedText = selection.toString().trim();
+    
+    if (selectedText) {
+      setSelectedText(selectedText);
+      setShowVocabularyModal(true);
+    } else {
+      // If no text selected, show modal anyway
+      setSelectedText('');
+      setShowVocabularyModal(true);
+    }
+  };
+  
+  const handleVocabularySaved = () => {
+    // Clear selection and show success message
+    window.getSelection().removeAllRanges();
+    setSelectedText('');
+    
+    // Show success toast
+    setToast({
+      message: '✨ Từ vựng đã được lưu thành công!',
+      type: 'success'
+    });
   };
 
   const handleHighlightText = () => {
@@ -166,29 +197,8 @@ export default function ReadingLesson() {
   return (
     <div className="flex-1 bg-blueGray-50 p-4">
       <div className="max-w-6xl mx-auto">
-        
-        {/* ==================== BREADCRUMB NAVIGATION ==================== */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-          <div className="flex items-center text-sm text-gray-600">
-            <button
-              onClick={handleGoToDashboard}
-              className="hover:text-blue-600 transition-colors"
-            >
-              <i className="fas fa-home mr-1"></i>
-              Dashboard
-            </button>
-            <i className="fas fa-chevron-right mx-2 text-gray-400"></i>
-            <button
-              onClick={handleBackToLessons}
-              className="hover:text-blue-600 transition-colors"
-            >
-              Bài học
-            </button>
-            <i className="fas fa-chevron-right mx-2 text-gray-400"></i>
-            <span className="text-gray-900 font-medium">Bài đọc</span>
-          </div>
-        </div>
 
+        
         {/* ==================== HEADER ==================== */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
@@ -202,7 +212,7 @@ export default function ReadingLesson() {
               >
                 <i className="fas fa-list text-blue-600 group-hover:text-blue-700"></i>
               </button>
-              
+
               {/* Secondary: Browser Back */}
               <button
                 onClick={handleBrowserBack}
@@ -212,7 +222,7 @@ export default function ReadingLesson() {
                 <i className="fas fa-arrow-left text-gray-600 group-hover:text-gray-700"></i>
               </button>
             </div>
-            
+
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{lesson.title}</h1>
               <div className="flex items-center mt-1">
@@ -272,9 +282,9 @@ export default function ReadingLesson() {
               <div className="bg-gray-50 p-6 rounded-lg border">
                 <div
                   className="text-gray-800 leading-relaxed whitespace-pre-wrap select-text"
-                  style={{ 
-                    fontSize: `${fontSize}px`, 
-                    lineHeight: fontSize <= 16 ? 1.6 : 1.5 
+                  style={{
+                    fontSize: `${fontSize}px`,
+                    lineHeight: fontSize <= 16 ? 1.6 : 1.5
                   }}
                 >
                   {lesson.content}
@@ -284,20 +294,22 @@ export default function ReadingLesson() {
           )}
 
           {/* Reading Stats */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-blue-50 p-4 rounded-lg text-center">
+          <div className="flex gap-4 mb-6">
+            <div className="flex-1 bg-blue-50 p-4 rounded-lg text-center">
               <div className="text-2xl font-bold text-blue-600">
                 {readingStats.wordsPerMinute}
               </div>
               <div className="text-sm text-gray-600">WPM (từ/phút)</div>
             </div>
-            <div className="bg-green-50 p-4 rounded-lg text-center">
+
+            <div className="flex-1 bg-green-50 p-4 rounded-lg text-center">
               <div className="text-2xl font-bold text-green-600">
                 {readingStats.estimatedTime}m
               </div>
               <div className="text-sm text-gray-600">Thời gian đọc</div>
             </div>
-            <div className="bg-purple-50 p-4 rounded-lg text-center">
+
+            <div className="flex-1 bg-purple-50 p-4 rounded-lg text-center">
               <div className="text-2xl font-bold text-purple-600">
                 {readingStats.totalWords.toLocaleString()}
               </div>
@@ -319,9 +331,13 @@ export default function ReadingLesson() {
             {/* Lưu từ vựng */}
             <button
               onClick={handleSaveVocabulary}
-              className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-3 px-6 rounded-lg shadow-md flex items-center transition-all transform hover:scale-105"
+              className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md flex items-center transition-all transform hover:scale-105"
+              style={{
+                backgroundColor: '#059669',
+                color: 'white'
+              }}
             >
-              <i className="fas fa-bookmark mr-2"></i>
+              <i className="fas fa-save mr-2 text-white" style={{ fontSize: '16px' }}></i>
               Lưu từ vựng
             </button>
 
@@ -353,7 +369,7 @@ export default function ReadingLesson() {
               <i className="fas fa-arrow-left mr-2"></i>
               Về danh sách bài học
             </button>
-            
+
             <div className="flex items-center space-x-4">
               <button
                 onClick={handleGoToDashboard}
@@ -379,6 +395,23 @@ export default function ReadingLesson() {
           )}
         </div>
       </div>
+      
+      {/* Save Vocabulary Modal */}
+      <SaveVocabularyModal
+        isOpen={showVocabularyModal}
+        onClose={() => setShowVocabularyModal(false)}
+        selectedText={selectedText}
+        onSaveSuccess={handleVocabularySaved}
+      />
+      
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

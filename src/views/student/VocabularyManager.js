@@ -37,7 +37,7 @@ export default function VocabularyManager() {
       ]);
       
       // Format vocabulary data for display
-      const formattedVocabulary = vocabularyData.map(personalVocabularyService.formatVocabularyForDisplay);
+      const formattedVocabulary = vocabularyData.map(vocab => personalVocabularyService.formatVocabularyForDisplay(vocab));
       setVocabulary(formattedVocabulary);
       setStats(statsData);
       

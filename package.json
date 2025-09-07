@@ -17,6 +17,7 @@
     "draft-js": "^0.11.7",
     "gulp": "4.0.2",
     "gulp-append-prepend": "1.0.8",
+    "jwt-decode": "^4.0.0",
     "postcss": "8.4.39",
     "quill": "^2.0.3",
     "react": "18.3.1",

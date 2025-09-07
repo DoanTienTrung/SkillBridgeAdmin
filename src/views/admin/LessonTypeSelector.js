@@ -10,7 +10,7 @@ export default function LessonTypeSelector() {
       type: 'listening',
       title: 'Bài Nghe',
       description: 'Tạo bài học luyện nghe với audio và câu hỏi',
-      icon: "fas fa-volume-up",
+     
       color: 'bg-blue-500',
       hoverColor: 'hover:bg-blue-600',
       borderColor: 'border-blue-200',
@@ -27,7 +27,7 @@ export default function LessonTypeSelector() {
       type: 'reading',
       title: 'Bài Đọc',
       description: 'Tạo bài học luyện đọc với văn bản và câu hỏi',
-      icon: 'fas fa-file-text',
+    
       color: 'bg-green-500',
       hoverColor: 'hover:bg-green-600',
       borderColor: 'border-green-200',

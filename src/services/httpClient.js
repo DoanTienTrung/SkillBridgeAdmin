@@ -230,33 +230,49 @@ class HttpClient {
   }
 
   /**
-   * Check if user is authenticated
-   */
-  isAuthenticated() {
-    const token = this.getAuthToken();
-    if (!token) return false;
-    
-    try {
-      // Simple token expiry check (decode JWT payload)
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const currentTime = Date.now() / 1000;
-      return payload.exp > currentTime;
-    } catch (error) {
-      console.error('Invalid token format: - httpClient.js:245', error);
-      this.setAuthToken(null);
-      return false;
-    }
-  }
-
-  /**
    * Get current user info from token
    */
   getCurrentUser() {
     const token = this.getAuthToken();
-    if (!token) return null;
+    if (!token) {
+      console.log('No token found  getCurrentUser - httpClient.js:238');
+      return null;
+    }
     
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Kiểm tra định dạng JWT (phải có 3 phần ngăn cách bởi '.')
+      const tokenParts = token.split('.');
+      if (tokenParts.length !== 3) {
+        console.error('Invalid JWT format  getCurrentUser - httpClient.js:246');
+        this.setAuthToken(null); // Xóa token lỗi
+        return null;
+      }
+
+      // Decode payload (phần thứ 2 của JWT)
+      let payload;
+      try {
+        // Chuẩn hóa base64 string
+        let base64 = tokenParts[1];
+        // Thêm padding nếu cần
+        while (base64.length % 4) {
+          base64 += '=';
+        }
+        
+        payload = JSON.parse(atob(base64));
+      } catch (decodeError) {
+        console.error('Base64 decode error  getCurrentUser: - httpClient.js:263', decodeError);
+        this.setAuthToken(null); // Xóa token lỗi
+        return null;
+      }
+
+      // Kiểm tra token có hết hạn không
+      const currentTime = Date.now() / 1000;
+      if (payload.exp && payload.exp < currentTime) {
+        console.log('Token expired  getCurrentUser - httpClient.js:271');
+        this.setAuthToken(null); // Xóa token hết hạn
+        return null;
+      }
+
       return {
         id: payload.userId,
         email: payload.sub,
@@ -265,8 +281,55 @@ class HttpClient {
         isActive: payload.isActive
       };
     } catch (error) {
-      console.error('Error decoding token: - httpClient.js:268', error);
+      console.error('Error decoding token  getCurrentUser: - httpClient.js:284', error);
+      // Xóa token lỗi và chuyển về login
+      this.setAuthToken(null);
+      
+      // Chỉ redirect nếu không phải đang ở trang login
+      if (!window.location.hash.includes('/auth/login')) {
+        window.location.hash = '/auth/login';
+      }
+      
       return null;
+    }
+  }
+
+  /**
+   * Check if user is authenticated
+   */
+  isAuthenticated() {
+    const token = this.getAuthToken();
+    if (!token) return false;
+    
+    try {
+      // Kiểm tra định dạng JWT
+      const tokenParts = token.split('.');
+      if (tokenParts.length !== 3) {
+        console.error('Invalid JWT format  isAuthenticated - httpClient.js:308');
+        this.setAuthToken(null);
+        return false;
+      }
+
+      // Decode và kiểm tra expiry
+      let base64 = tokenParts[1];
+      while (base64.length % 4) {
+        base64 += '=';
+      }
+      
+      const payload = JSON.parse(atob(base64));
+      const currentTime = Date.now() / 1000;
+      
+      if (payload.exp && payload.exp < currentTime) {
+        console.log('Token expired  isAuthenticated - httpClient.js:323');
+        this.setAuthToken(null);
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Token validation error  isAuthenticated: - httpClient.js:330', error);
+      this.setAuthToken(null);
+      return false;
     }
   }
 }
